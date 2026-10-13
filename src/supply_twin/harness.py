@@ -27,6 +27,11 @@ from supply_twin.sim import Scenario, Strategy, simulate
 from supply_twin.twin import TwinState
 
 FILL_NON_INFERIORITY = 0.002  # accept at most 0.2 points of fill rate loss
+# Paired seeds make the confidence intervals very tight (a few thousand on a cost of 2.4M),
+# so almost any change is "significant". The twin's own demand bias in the backtest is
+# about 3%, so a gain smaller than this share of baseline cost is inside model error and
+# is not worth a rollout. The whole interval has to clear it, not just the mean.
+MIN_COST_GAIN_SHARE = 0.005
 
 _WORKER_TWIN: TwinState | None = None
 
@@ -60,6 +65,7 @@ class Comparison:
     baseline: Strategy
     n_seeds: int
     alpha: float
+    baseline_cost: float
     cost_diff: tuple[float, float, float]  # candidate minus baseline, (mean, low, high)
     fill_diff: tuple[float, float, float]
     util_diff: tuple[float, float, float]
@@ -67,7 +73,7 @@ class Comparison:
 
     @property
     def cost_better(self) -> bool:
-        return self.cost_diff[2] < 0
+        return self.cost_diff[2] < -MIN_COST_GAIN_SHARE * self.baseline_cost
 
     @property
     def fill_ok(self) -> bool:
@@ -80,6 +86,7 @@ class Comparison:
     def row(self) -> dict[str, object]:
         return {
             "candidate": self.candidate.key(),
+            "baseline_cost": self.baseline_cost,
             "cost_diff": self.cost_diff[0],
             "cost_diff_low": self.cost_diff[1],
             "cost_diff_high": self.cost_diff[2],
@@ -140,6 +147,7 @@ class Evaluator:
             baseline=baseline,
             n_seeds=len(seeds),
             alpha=alpha,
+            baseline_cost=float(b["total_cost"].mean()),
             cost_diff=mean_ci(d_cost, level),
             fill_diff=mean_ci((c["fill_rate"] - b["fill_rate"]).to_numpy(), level),
             util_diff=mean_ci((c["truck_utilisation"] - b["truck_utilisation"]).to_numpy(), level),
@@ -153,6 +161,7 @@ SUMMARY_METRICS = [
     "total_cost",
     "operating_cost",
     "lost_margin",
+    "overflow_cost",
     "truck_utilisation",
     "load_fill",
 ]

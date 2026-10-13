@@ -4,7 +4,8 @@ The proposer and the judge are separate on purpose. A proposer (a deterministic 
 search, or optionally a language model) can suggest anything inside the parameter grid;
 only the harness, on paired seeds, can move the incumbent. Because every round tests
 several candidates, the significance level is split across them (Bonferroni); otherwise
-a search that looks at enough candidates will eventually accept noise.
+a search that looks at enough candidates will eventually accept noise. A step is only
+taken if the gain also clears a practical floor (see harness.MIN_COST_GAIN_SHARE).
 
 The final incumbent is then re-tested against the original plan on hold-out seeds the
 search never saw, which is the number that gets reported.
@@ -23,7 +24,7 @@ GRID: dict[str, list[float | int | bool]] = {
     "z": [0.5, 0.84, 1.28, 1.65, 2.05],
     "review_days": [1, 2, 3],
     "cover_days": [0.0, 0.5, 1.0, 2.0, 3.0],
-    "extra_trucks": [-6, -4, -2, 0, 2, 4],
+    "extra_trucks": [-10, -8, -6, -4, -2, 0, 2, 4],
     "promo_aware": [False, True],
 }
 
@@ -93,7 +94,7 @@ def search(
     start: Strategy | None = None,
     alpha: float = 0.05,
     bonferroni: bool = True,
-    max_rounds: int = 8,
+    max_rounds: int = 10,
 ) -> SearchResult:
     start = start or Strategy()
     incumbent = start
