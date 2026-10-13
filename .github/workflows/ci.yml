@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked
+
+      - name: lint
+        run: uv run ruff check .
+
+      - name: format
+        run: uv run ruff format --check .
+
+      - name: types
+        run: uv run mypy
+
+      # No model server is needed: the language-model proposer is optional and its
+      # tests use a stubbed completion function.
+      - name: tests
+        run: uv run pytest -q
+
+      # Same pipeline as `make run`, with fewer seeds so the job stays short.
+      - name: end-to-end run
+        run: |
+          uv run python scripts/generate_data.py
+          uv run supply-twin all --seeds 5 --search-seeds 5 --holdout-seeds 5 --out ci-outputs

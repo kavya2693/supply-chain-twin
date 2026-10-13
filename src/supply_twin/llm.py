@@ -9,6 +9,7 @@ never an unchecked policy.
 from __future__ import annotations
 
 import json
+import os
 import re
 import urllib.request
 from collections.abc import Callable, Sequence
@@ -21,9 +22,9 @@ from supply_twin.sim import Strategy
 Complete = Callable[[str], str]
 
 
-def ollama_complete(
-    model: str = "llama3.2", host: str = "http://localhost:11434", timeout: float = 180
-) -> Complete:
+def ollama_complete(model: str = "llama3.2", host: str | None = None, timeout: float = 180) -> Complete:
+    host = host or os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+
     def call(prompt: str) -> str:
         body = json.dumps(
             {
