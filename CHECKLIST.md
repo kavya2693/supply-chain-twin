@@ -9,7 +9,7 @@
 [x] Tests pass locally, output captured
 [x] Lint + format + types clean
 [x] One-command E2E run verified on this machine (make run, outputs/)
-[ ] Gate 2 closed (results not yet reviewed by Kavyasri)
+[ ] Gate 2 closed (results not yet reviewed by Kavyasri; published per build brief)
 [ ] Dockerfile builds and runs (not built locally)
 [ ] CI workflow green on GitHub
 [x] .env.example present, no real values
