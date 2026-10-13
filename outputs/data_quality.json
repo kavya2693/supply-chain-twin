@@ -1,0 +1,26 @@
+{
+  "items_missing_cost": 1,
+  "trucks_in_source": 28,
+  "trucks_missing_capacity": 1,
+  "trucks_not_dispatchable": 2,
+  "order_lines": 3126764,
+  "order_lines_orphan_key": 0,
+  "store_days_missing": 160,
+  "order_units_clipped_as_bulk": 2735,
+  "stores": 36,
+  "skus": 120,
+  "trucks_dispatchable": 26,
+  "holiday_factor": 1.797,
+  "holiday_eve_factor": 1.346,
+  "dispersion_k": 3.748,
+  "promo_uplift_by_category": {
+    "baby": 1.24,
+    "beverages": 1.899,
+    "dairy": 1.38,
+    "frozen": 1.615,
+    "household": 1.501,
+    "pantry": 1.555,
+    "personal_care": 1.348,
+    "snacks": 1.697
+  }
+}

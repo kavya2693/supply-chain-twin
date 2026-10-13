@@ -1,0 +1,28 @@
+{
+  "proposer": "neighbour",
+  "correction": "bonferroni",
+  "search_seeds": 20,
+  "rounds": 8,
+  "candidates_tested": 71,
+  "steps_accepted": 7,
+  "start": "z=1.28 review=1d cover=1d trucks+0 promo_aware=no",
+  "final": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+  "search_cost_gain_sum_of_steps": -410569.2259310232,
+  "first_step_gain": -143754.6866825,
+  "holdout": {
+    "candidate": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+    "baseline_cost": 2458346.588196777,
+    "cost_diff": -407200.4400791078,
+    "cost_diff_low": -410362.5709805631,
+    "cost_diff_high": -404038.3091776525,
+    "fill_diff_pts": -0.13322616797698564,
+    "fill_diff_low_pts": -0.14126006921750647,
+    "util_diff_pts": 12.92806384092063,
+    "p_value": 1.4882567196728053e-50,
+    "alpha": 0.05,
+    "accepted": true,
+    "n_seeds": 30
+  },
+  "simulation_runs_total": 1930,
+  "wall_seconds": 69.1
+}

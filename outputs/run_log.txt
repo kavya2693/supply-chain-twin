@@ -1,0 +1,13 @@
+uv run python scripts/generate_data.py
+wrote 120 items, 36 stores, 28 trucks, 3,126,764 order lines (136,293,062 units) to data
+uv run supply-twin all
+twin built: {"items_missing_cost": 1, "trucks_in_source": 28, "trucks_missing_capacity": 1, "trucks_not_dispatchable": 2, "order_lines": 3126764, "order_lines_orphan_key": 0, "store_days_missing": 160, "order_units_clipped_as_bulk": 2735, "stores": 36, "skus": 120, "trucks_dispatchable": 26, "holiday_factor": 1.797, "holiday_eve_factor": 1.346, "dispersion_k": 3.748}
+fidelity (store x SKU x week WAPE): twin 17.8%, recent_8wk_mean 24.5%, same_day_last_year 29.1%; forecast-error sigma 0.104
+evaluated 7 strategies on 'base' x 30 seeds (current policy fill 0.9993)
+evaluated 7 strategies on 'promo' x 30 seeds (current policy fill 0.9985)
+evaluated 7 strategies on 'fleet_outage' x 30 seeds (current policy fill 0.9982)
+search [neighbour_promo] z=1.28 review=1d cover=1d trucks+0 promo_aware=no -> z=0.84 review=2d cover=1d trucks-8 promo_aware=yes | hold-out cost -407,200 fill -0.13 pts
+robustness [base] cost -398,970 fill -0.21 pts -> does not hold
+robustness [promo] cost -407,200 fill -0.13 pts -> holds
+robustness [fleet_outage] cost +63,322 fill -1.88 pts -> does not hold
+make run  286.09s user 60.11s system 236% cpu 2:26.26 total
