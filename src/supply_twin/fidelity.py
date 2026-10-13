@@ -74,7 +74,7 @@ def backtest(src: Sources, holdout_days: int = 91) -> Fidelity:
         p_w = weekly(p)
         sku_wape[name] = _wape(a_w, p_w)
         cat_wape[name] = _wape(by_cat(a_w), by_cat(p_w))
-        bias[name] = float(p_w.sum() / a_w.sum() - 1)
+        bias[name] = float(p_w.sum()) / float(a_w.sum()) - 1
         promo_wape[name] = _wape(a_w[promo_cells], p_w[promo_cells]) if promo_cells.any() else float("nan")
 
     tot_a = np.where(mask, actual, 0).sum(axis=0)
