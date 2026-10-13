@@ -30,6 +30,8 @@ SPEED_KMH = 50.0
 LOAD_HOURS, UNLOAD_HOURS = 0.75, 1.0
 DRIVER_COST_PER_HOUR = 28.0
 HOLDING_RATE_PER_YEAR = 0.25
+# Stock beyond the backroom goes to a rented trailer or gets double-handled on the floor.
+OVERFLOW_COST_PER_CASE_DAY = 1.0
 
 
 @dataclass(frozen=True)
@@ -80,6 +82,7 @@ class RunResult:
     promo_demand_units: float
     promo_sold_units: float
     holding_cost: float
+    overflow_cost: float
     transport_cost: float
     fleet_fixed_cost: float
     lost_margin: float
@@ -100,7 +103,7 @@ class RunResult:
 
     @property
     def operating_cost(self) -> float:
-        return self.holding_cost + self.transport_cost + self.fleet_fixed_cost
+        return self.holding_cost + self.overflow_cost + self.transport_cost + self.fleet_fixed_cost
 
     @property
     def total_cost(self) -> float:
@@ -122,6 +125,7 @@ class RunResult:
             "total_cost": self.total_cost,
             "operating_cost": self.operating_cost,
             "holding_cost": self.holding_cost,
+            "overflow_cost": self.overflow_cost,
             "transport_cost": self.transport_cost,
             "fleet_fixed_cost": self.fleet_fixed_cost,
             "lost_margin": self.lost_margin,
@@ -217,6 +221,7 @@ def simulate(twin: TwinState, strategy: Strategy, scenario: Scenario, seed: int)
         "sold": 0.0,
         "promo_sold": 0.0,
         "holding": 0.0,
+        "overflow": 0.0,
         "transport": 0.0,
         "lost_margin": 0.0,
         "truck_hours": 0.0,
@@ -264,6 +269,11 @@ def simulate(twin: TwinState, strategy: Strategy, scenario: Scenario, seed: int)
     def store_day(day: int) -> simpy.events.ProcessGenerator:
         yield env.timeout(day * 24 + SALES_HOUR - env.now)
         dem = demand[day]
+        # Peak stock is just before the evening trade, after the day's deliveries landed.
+        cases = (on_hand / twin.case_pack[None, :]).sum(axis=1)
+        stats["overflow"] += (
+            float(np.maximum(cases - twin.backroom_cases, 0).sum()) * OVERFLOW_COST_PER_CASE_DAY
+        )
         sold = np.minimum(on_hand, dem)
         on_hand[:] -= sold
         stats["sold"] += float(sold.sum())
@@ -303,6 +313,7 @@ def simulate(twin: TwinState, strategy: Strategy, scenario: Scenario, seed: int)
         promo_demand_units=promo_dem,
         promo_sold_units=stats["promo_sold"],
         holding_cost=stats["holding"],
+        overflow_cost=stats["overflow"],
         transport_cost=stats["transport"],
         fleet_fixed_cost=fixed,
         lost_margin=stats["lost_margin"],

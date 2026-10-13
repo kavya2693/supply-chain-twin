@@ -35,6 +35,7 @@ class TwinState:
     categories: np.ndarray  # (sku,) category name
     store_dc: np.ndarray  # (store,) DC id
     distance_km: np.ndarray  # (store,)
+    backroom_cases: np.ndarray  # (store,) storage the store has before stock spills over
     unit_cost: np.ndarray  # (sku,)
     unit_price: np.ndarray  # (sku,)
     case_pack: np.ndarray  # (sku,)
@@ -229,6 +230,7 @@ def build_twin(src: Sources, cutoff: dt.date = HISTORY_END, rate_window_days: in
         categories=cats,
         store_dc=loc["dc_id"].to_numpy(),
         distance_km=loc["distance_km"].to_numpy(dtype=float),
+        backroom_cases=loc["backroom_cases"].to_numpy(dtype=float),
         unit_cost=items["unit_cost"].to_numpy(dtype=float),
         unit_price=items["unit_price"].to_numpy(dtype=float),
         case_pack=items["case_pack"].to_numpy(dtype=float),

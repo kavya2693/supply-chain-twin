@@ -11,6 +11,7 @@ Patterns put in on purpose, because the twin has to cope with them:
 - over-dispersed (negative binomial) daily noise
 - occasional bulk orders (outliers) and store feed outages (missing days)
 - missing unit costs in MMS and missing truck capacities in FMS
+- store backroom capacity in the location master, about five days of trade
 """
 
 from __future__ import annotations
@@ -100,7 +101,7 @@ def _orders(rng: np.random.Generator, skus: pd.DataFrame, stores: pd.DataFrame) 
 
     day_factor = np.ones((n_d, n_k))
     doy = np.array([d.timetuple().tm_yday for d in days])
-    weekend = np.array([d.weekday() >= 4 for d in days])  # Friday and Saturday peak
+    weekend = np.array([d.weekday() >= 4 for d in days])  # Friday to Sunday peak
     for c, (wk, amp, peak, _) in CATEGORIES.items():
         idx = cat_names == c
         season = 1 + amp * np.cos(2 * np.pi * (doy - peak) / 365.25)
@@ -119,6 +120,10 @@ def _orders(rng: np.random.Generator, skus: pd.DataFrame, stores: pd.DataFrame) 
             day_factor[start : start + 14, idx] *= uplift
 
     mu = base[None, :, :] * day_factor[:, None, :]
+
+    # Backrooms are built for roughly five days of average trade, give or take.
+    daily_cases = (mu / skus["case_pack"].to_numpy()[None, None, :]).mean(axis=0).sum(axis=1)
+    stores["backroom_cases"] = np.round(daily_cases * 5.0 * rng.uniform(0.85, 1.15, size=n_s), -1)
     dispersion = 4.0
     p = dispersion / (dispersion + mu)
     units = rng.negative_binomial(dispersion, p).astype(np.int64)
@@ -143,7 +148,7 @@ def _orders(rng: np.random.Generator, skus: pd.DataFrame, stores: pd.DataFrame) 
     )
 
 
-def generate(out: Path, seed: int = 7, n_stores: int = 36, n_skus: int = 120, n_trucks: int = 40) -> None:
+def generate(out: Path, seed: int = 7, n_stores: int = 36, n_skus: int = 120, n_trucks: int = 28) -> None:
     rng = np.random.default_rng(seed)
     out.mkdir(parents=True, exist_ok=True)
     skus = _skus(rng, n_skus)
