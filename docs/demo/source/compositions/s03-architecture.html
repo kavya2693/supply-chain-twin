@@ -11,7 +11,7 @@
         #arch-root .gut { position: absolute; left: 90px; width: 210px; padding-left: 18px; }
         #arch-root .gut .bar { position: absolute; left: 0; top: 2px; width: 6px; height: 56px; border-radius: 3px; }
         #arch-root .gut .n { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.12em; }
-        #arch-root .gut .c { margin-top: 6px; font-family: var(--mono); font-size: 20px; color: var(--ink-mute); white-space: nowrap; }
+        #arch-root .gut .c { margin-top: 6px; font-size: 22px; font-weight: 500; color: var(--ink-soft); white-space: nowrap; }
         #arch-root .node {
           position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 4px;
           padding: 14px 18px 0; border: 2px solid var(--line); border-radius: 12px; background: var(--panel);
@@ -21,11 +21,11 @@
         #arch-root .node.cyl .t, #arch-root .node.cyl .s { position: relative; }
         #arch-root .node .t { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
         #arch-root .node.cyl .t { font-size: 24px; }
-        #arch-root .node .s { font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap; }
+        #arch-root .node .s { font-size: 22px; font-weight: 500; color: var(--ink-soft); white-space: nowrap; }
         #arch-root .node .s.nfr { color: var(--c-eval); }
         #arch-root .node .s.ok { color: var(--c-opt); }
         #arch-root .node .f {
-          position: absolute; left: 14px; top: -15px; font-family: var(--mono); font-size: 20px; line-height: 24px; padding: 1px 9px;
+          position: absolute; left: 14px; top: -16px; font-family: var(--mono); font-size: 22px; line-height: 26px; padding: 0 9px;
           border-radius: 6px; background: var(--bg); border: 2px solid var(--line); white-space: nowrap;
         }
         #arch-root .node.cyl .f { top: -10px; left: 50%; transform: translateX(-50%); }
@@ -45,23 +45,23 @@
         #arch-root .node.gate .t { font-size: 30px; }
         #arch-root .node.gate { padding-top: 6px; }
         #arch-root .dp {
-          position: absolute; right: 14px; top: -15px; font-family: var(--mono); font-size: 20px; line-height: 24px; padding: 1px 9px;
+          position: absolute; right: 14px; top: -16px; font-family: var(--mono); font-size: 22px; line-height: 26px; padding: 0 9px;
           border-radius: 6px; background: var(--c-opt-deep); color: #fff; white-space: nowrap;
         }
         #arch-root .ctr {
-          position: absolute; right: 14px; bottom: -42px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 20px;
-          line-height: 24px; padding: 1px 10px; border-radius: 6px; background: var(--bg); border: 2px solid rgba(63, 216, 168, 0.6);
+          position: absolute; right: 14px; bottom: -42px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 22px;
+          line-height: 26px; padding: 1px 10px; border-radius: 6px; background: var(--bg); border: 2px solid rgba(63, 216, 168, 0.6);
           color: var(--c-opt); white-space: nowrap;
         }
-        #arch-root .wl { position: absolute; font-family: var(--mono); font-size: 20px; line-height: 24px; white-space: nowrap; }
-        #arch-root .wl.pill { padding: 1px 10px; border-radius: 999px; background: var(--bg); border: 2px solid currentColor; }
+        #arch-root .wl { position: absolute; font-family: var(--sans); font-size: 22px; font-weight: 500; line-height: 26px; white-space: nowrap; }
+        #arch-root .wl.pill { font-family: var(--mono); font-weight: 400; padding: 1px 10px; border-radius: 999px; background: var(--bg); border: 2px solid currentColor; }
         #arch-root .wl.pill span { color: var(--ink); }
         #arch-root .legend { position: absolute; left: 330px; top: 912px; width: 700px; }
-        #arch-root .legend .r { display: flex; gap: 30px; height: 34px; align-items: center; font-family: var(--mono); font-size: 20px; color: var(--ink-soft); }
+        #arch-root .legend .r { display: flex; gap: 30px; height: 34px; align-items: center; font-family: var(--mono); font-size: 22px; color: var(--ink-soft); }
         #arch-root .legend .r span { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
         #arch-root .legend svg { width: 46px; height: 10px; }
         #arch-root .crit {
-          position: absolute; right: 120px; top: 190px; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: 0.1em;
+          position: absolute; right: 120px; top: 186px; font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.08em;
           padding: 3px 14px; border-radius: 6px; color: #0a1119; background: var(--c-opt); white-space: nowrap;
         }
       </style>
@@ -70,6 +70,7 @@
         <div class="scene" id="arch-in">
           <div class="eyebrow" data-layout-allow-overlap id="arch-eyebrow">05 · Architecture</div>
           <div class="scene-title" data-layout-allow-overlap id="arch-title">Proposers only propose. A paired-seed gate decides.</div>
+          <div class="scene-sub" id="arch-sub" style="width: 1080px">Each box is a file in the repo. Data flows down; the green gate decides.</div>
           <div class="crit" id="arch-crit">CRITICAL PATH · MAKE RUN ≈ 2.5 MIN</div>
           <div class="diagram" id="arch-diagram">
             <div id="arch-strips"></div>
@@ -78,11 +79,11 @@
             <div id="arch-labels"></div>
             <div class="legend" id="arch-legend">
               <div class="r">
-                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#b2bfcc" stroke-width="4" /></svg>in-process call</span>
-                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#b2bfcc" stroke-width="4" stroke-dasharray="9 6" /></svg>file read / write (batch)</span>
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#c8d3de" stroke-width="4" /></svg>in-process call</span>
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#c8d3de" stroke-width="4" stroke-dasharray="9 6" /></svg>file read / write (batch)</span>
               </div>
               <div class="r">
-                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#b2bfcc" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round" /></svg>HTTP, optional</span>
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#c8d3de" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round" /></svg>HTTP, optional</span>
                 <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#ff8a73" stroke-width="4" /></svg>fallback path</span>
               </div>
             </div>
@@ -234,6 +235,7 @@
           tl.fromTo("#arch-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#arch-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#arch-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#arch-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
           tl.fromTo("#arch-diagram", { scale: 0.985 }, { scale: 1, duration: D, ease: "sine.out" }, 0);
           tl.fromTo("#arch-legend", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 6.0);
 
@@ -302,16 +304,15 @@
           // 3. critical path: dim everything off it, brighten the edges on it
           const CP = OUT0 + 1.0;
           const off = NODES.filter((n) => n.minor).map((n) => "#n-" + n.id);
-          tl.to(off, { opacity: 0.25, duration: 0.5 }, CP);
-          tl.to("#arch-strips", { opacity: 0.5, duration: 0.5 }, CP);
+          tl.to(off, { opacity: 0.75, duration: 0.5 }, CP); // stays >= 4.5:1
           WIRES.forEach((w, i) => {
             if (w.crit) tl.to(W[w.id].el, { attr: { opacity: 1, "stroke-width": 5.5 }, duration: 0.5 }, CP + (i % 5) * 0.04);
             else tl.to(W[w.id].el, { attr: { opacity: 0.2 }, duration: 0.5 }, CP);
           });
-          LABELS.forEach((l, i) => { if (!W[l.w].crit) tl.to("#arch-l" + i, { opacity: 0.25, duration: 0.5 }, CP); });
+          LABELS.forEach((l, i) => { if (!W[l.w].crit) tl.to("#arch-l" + i, { opacity: 0.75, duration: 0.5 }, CP); });
           tl.fromTo("#arch-crit", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, CP + 0.2);
 
-          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["arch"] = tl;
         })();
       </script>

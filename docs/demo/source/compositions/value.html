@@ -8,8 +8,10 @@
            person using it (right). Data is inlined by tools/inject_sheet.py between the SHEET markers. */
         #value-root {
           position: absolute; inset: 0;
-          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #6b7280; --w-line: #d1d5db; --w-faint: #f3f4f6;
+          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #4b5563; --w-line: #d1d5db; --w-faint: #f3f4f6;
           --w-data: #d97706; --w-model: #6d3cf0; --w-tools: #1f8fa8; --w-risk: #dc2b4a; --w-opt: #0f9f6e;
+          /* text versions of the layer colours: every one is >= 4.5:1 on white (the fills above are for tiles only) */
+          --w-opt-t: #047857; --w-risk-t: #be123c;
           color: var(--w-ink); font-family: Inter, "Helvetica Neue", sans-serif;
         }
         #value-root .page { position: absolute; inset: 0; background: var(--w-bg); }
@@ -26,7 +28,7 @@
         #value-root .uline { position: absolute; left: 124px; top: 222px; width: 120px; height: 10px; border-radius: 5px; background: var(--w-model); transform-origin: left center; }
         /* sheet */
         #value-root .sheet {
-          position: absolute; left: 120px; top: 280px; width: 1050px; height: 640px; border: 3px solid var(--w-line);
+          position: absolute; left: 120px; top: 300px; width: 1050px; height: 620px; border: 3px solid var(--w-line);
           border-radius: 24px; background: #fff; box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08); overflow: hidden;
         }
         #value-root .sheet-head {
@@ -35,27 +37,27 @@
         }
         #value-root .sheet-head span:last-child { color: #c4b5fd; }
         #value-root .row {
-          position: relative; display: flex; align-items: center; height: 64px; padding: 0 26px;
-          font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
+          position: relative; display: flex; align-items: center; height: 61px; padding: 0 26px;
+          font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
         }
-        #value-root .row.hdr { height: 54px; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; color: var(--w-mute); background: #fafafa; }
+        #value-root .row.hdr { height: 54px; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: var(--w-mute); background: #fafafa; }
         #value-root .row .tint { position: absolute; inset: 0; opacity: 0; background: rgba(109, 60, 240, 0.12); }
         #value-root .row.base { color: var(--w-soft); }
         #value-root .c { position: relative; white-space: nowrap; }
-        #value-root .c1 { width: 300px; font-family: Inter, sans-serif; font-size: 22px; font-weight: 700; }
-        #value-root .row.hdr .c1 { font-family: "JetBrains Mono", monospace; font-size: 18px; }
-        #value-root .c2 { width: 140px; text-align: right; padding-right: 22px; }
-        #value-root .c3 { width: 220px; text-align: right; padding-right: 22px; }
-        #value-root .c3 small { font-size: 18px; color: var(--w-mute); }
+        #value-root .c1 { width: 270px; font-family: Inter, sans-serif; font-size: 22px; font-weight: 700; }
+        #value-root .row.hdr .c1 { font-family: "JetBrains Mono", monospace; font-size: 22px; }
+        #value-root .c2 { width: 150px; text-align: right; padding-right: 22px; }
+        #value-root .c3 { width: 240px; text-align: right; padding-right: 22px; }
+        #value-root .c3 small { font-size: 22px; color: var(--w-mute); }
         #value-root .c4 { width: 100px; text-align: right; padding-right: 16px; }
         #value-root .c5 { width: 110px; text-align: right; padding-right: 16px; }
         #value-root .c6 { width: 128px; text-align: right; }
-        #value-root .vd { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 19px; font-weight: 700; color: #fff; }
-        #value-root .vd.go { background: var(--w-opt); }
-        #value-root .vd.no { background: var(--w-risk); }
+        #value-root .vd { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 22px; font-weight: 700; color: #fff; }
+        #value-root .vd.go { background: var(--w-opt-t); }
+        #value-root .vd.no { background: var(--w-risk-t); }
         #value-root .vd.base { background: var(--w-line); color: var(--w-soft); }
-        #value-root .neg { color: var(--w-opt); font-weight: 700; }
-        #value-root .pos { color: var(--w-risk); font-weight: 700; }
+        #value-root .neg { color: var(--w-opt-t); font-weight: 700; }
+        #value-root .pos { color: var(--w-risk-t); font-weight: 700; }
         #value-root .totals {
           position: absolute; left: 0; bottom: 0; width: 100%; height: 66px; display: flex; align-items: center; gap: 14px; padding: 0 30px;
           background: #ecfdf5; border-top: 2px solid #a7f3d0; font-size: 23px; font-weight: 700; color: #065f46; white-space: nowrap;
@@ -63,30 +65,32 @@
         #value-root .totals b { display: block; width: 28px; height: 28px; border-radius: 50%; background: var(--w-opt); position: relative; flex: 0 0 auto; }
         #value-root .totals svg { position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; }
         /* scene */
-        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); white-space: nowrap; }
-        #value-root .desk { position: absolute; left: 1220px; top: 312px; width: 600px; height: 128px; border-radius: 20px; background: var(--w-faint); }
+        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.06em; color: var(--w-mute); white-space: nowrap; }
+        #value-root .desk { position: absolute; left: 1220px; top: 330px; width: 600px; height: 128px; border-radius: 20px; background: var(--w-faint); }
         #value-root .pick {
-          position: absolute; left: 1330px; top: 334px; width: 470px; height: 84px; border-radius: 14px; background: #fff;
+          position: absolute; left: 1330px; top: 352px; width: 470px; height: 84px; border-radius: 14px; background: #fff;
           border: 3px solid var(--w-model); display: flex; flex-direction: column; justify-content: center; padding: 0 20px;
         }
         #value-root .pick .a { font-size: 24px; font-weight: 700; color: var(--w-ink); white-space: nowrap; }
-        #value-root .pick .b { margin-top: 2px; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-opt); white-space: nowrap; }
+        #value-root .pick .b { margin-top: 2px; font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-opt-t); white-space: nowrap; }
         #value-root .map {
-          position: absolute; left: 1220px; top: 462px; width: 600px; height: 458px; border-radius: 24px; border: 3px solid var(--w-line);
+          position: absolute; left: 1220px; top: 480px; width: 600px; height: 440px; border-radius: 24px; border: 3px solid var(--w-line);
           background-color: #fbfbfc;
           background-image: linear-gradient(#eef0f3 2px, transparent 2px), linear-gradient(90deg, #eef0f3 2px, transparent 2px);
           background-size: 48px 48px; overflow: hidden;
         }
         #value-root .day {
-          position: absolute; left: 1700px; top: 476px; width: 100px; text-align: right; font-family: "JetBrains Mono", monospace;
+          position: absolute; left: 1700px; top: 494px; width: 100px; text-align: right; font-family: "JetBrains Mono", monospace;
           font-size: 22px; font-weight: 700; color: var(--w-model);
         }
         #value-root .meter { position: absolute; left: 1244px; width: 552px; }
-        #value-root .meter .ml { display: flex; justify-content: space-between; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-soft); white-space: nowrap; }
+        #value-root .meter .ml { display: flex; justify-content: space-between; font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-soft); white-space: nowrap; }
         #value-root .meter .ml b { color: var(--w-ink); }
         #value-root .meter .tr { position: relative; margin-top: 6px; height: 14px; border-radius: 7px; background: #e5e7eb; }
         #value-root .meter .fi { position: absolute; left: 0; top: 0; width: 552px; height: 14px; border-radius: 7px; transform-origin: left center; }
         #value-root svg.layer { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #value-root .subt { position: absolute; left: 120px; top: 248px; width: 1680px; font-size: 26px; font-weight: 500; color: var(--w-soft); }
+        #value-root .subt b { color: var(--w-ink); }
         #value-root .caption {
           position: absolute; left: 120px; top: 944px; width: 1700px; font-size: 30px; font-weight: 700; color: var(--w-ink);
         }
@@ -97,20 +101,21 @@
           <div class="kick" id="va-kick">07 · END-USER VALUE</div>
           <div class="ttl" id="va-ttl">What the <em>planner</em> gets</div>
           <div class="uline" id="va-ul"></div>
+          <div class="subt" id="va-sub">Each row is one change, run on the same 30 simulated quarters. <b>Negative cost vs today</b> = a saving; <b>✓ GO</b> = passed the gate.</div>
           <div class="sheet" id="va-sheet">
             <div class="sheet-head"><span>CHANGE SCORECARD</span><span id="va-head-r"></span></div>
             <div class="row hdr" id="va-hdr">
-              <div class="c c1">CHANGE</div><div class="c c2">COST / QTR</div><div class="c c3">VS TODAY ±95%</div>
+              <div class="c c1">CHANGE</div><div class="c c2">COST/QTR</div><div class="c c3">VS TODAY ±95%</div>
               <div class="c c4">FILL</div><div class="c c5">PROMO</div><div class="c c6">VERDICT</div>
             </div>
             <div id="va-rows"></div>
             <div class="totals" id="va-totals"></div>
           </div>
-          <div class="scene-lab" id="va-lab-desk" style="left: 1220px; top: 280px">PLANNER · PICKS A CHANGE</div>
+          <div class="scene-lab" id="va-lab-desk" style="left: 1220px; top: 296px">PLANNER · PICKS A CHANGE</div>
           <div class="desk" id="va-desk"></div>
           <div class="pick" id="va-pick"><div class="a" id="va-pick-a"></div><div class="b" id="va-pick-b"></div></div>
           <div class="map" id="va-map"></div>
-          <div class="scene-lab" id="va-lab-map" style="left: 1244px; top: 476px">DCS → 36 STORES · NEXT QUARTER</div>
+          <div class="scene-lab" id="va-lab-map" style="left: 1244px; top: 494px">DCS → 36 STORES · NEXT QUARTER</div>
           <div class="day" id="va-day">DAY 1</div>
           <svg class="layer" id="va-svg" viewBox="0 0 1920 1080"></svg>
           <div class="meter" id="va-m1" style="top: 800px"><div class="ml"><span>truck load fill</span><b id="va-m1v"></b></div><div class="tr"><div class="fi" id="va-m1f" style="background: var(--w-opt)"></div></div></div>
@@ -134,9 +139,9 @@
               "fleet +4 trucks": "Fleet +4 trucks",
               "high service (z=2.05, cover 2d)": "High service",
             },
-            dc: { DC1: [1384, 652], DC2: [1660, 652] }, // DC positions in the panel; store distance from its DC is real (km)
+            dc: { DC1: [1384, 662], DC2: [1660, 662] }, // DC positions in the panel; store distance from its DC is real (km)
             pxPerKm: 0.68,
-            person: { x: 1272, y: 380 },
+            person: { x: 1272, y: 398 },
           };
           const NS = "http://www.w3.org/2000/svg";
           const svg = document.getElementById("va-svg");
@@ -207,7 +212,7 @@
           Object.entries(CONFIG.dc).forEach(([dc, [cx, cy]]) => {
             const g = el("g", { id: "va-" + dc });
             el("rect", { x: cx - 30, y: cy - 22, width: 60, height: 44, rx: 10, fill: "#111827" }, g);
-            const t = el("text", { x: cx, y: cy + 7, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#fff" }, g);
+            const t = el("text", { x: cx, y: cy + 7, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 22, "font-weight": 700, fill: "#fff" }, g);
             t.textContent = dc;
           });
 
@@ -218,6 +223,7 @@
           tl.fromTo("#va-kick", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
           tl.fromTo("#va-ttl", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.55);
           tl.fromTo("#va-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 0.9);
+          tl.fromTo("#va-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.0);
           tl.fromTo("#va-sheet", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
           rows.forEach((_, i) => {
             tl.fromTo("#va-r" + i, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 1.3 + i * 0.28);
@@ -250,6 +256,8 @@
           tl.fromTo("#va-m1f", { scaleX: cur.load_fill }, { scaleX: pr.load_fill, duration: 1.4, ease: "power2.inOut" }, DAY0 + 0.4);
           tl.fromTo("#va-m2f", { scaleX: cur.promo_fill_rate }, { scaleX: pr.promo_fill_rate, duration: 1.4, ease: "power2.inOut" }, DAY0 + 0.8);
           tl.fromTo("#va-caption", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 10.4);
+          // all text fades fully out before the wipe, so no two slides' text is ever on screen together
+          tl.to(["#va-kick", "#va-ttl", "#va-ul", "#va-sub", "#va-sheet", "#va-lab-desk", "#va-desk", "#va-pick", "#va-person", "#va-map", "#va-lab-map", "#va-day", "#va-svg", "#va-m1", "#va-m2", "#va-caption"], { opacity: 0, duration: 0.35, ease: "power2.in" }, D - 1.05);
           // wipe out (white -> dark), revealing the next dark scene underneath
           tl.to("#va-page", { clipPath: "inset(0px 0px 0px 100%)", duration: 0.7, ease: "power3.inOut" }, D - 0.7);
           tl.fromTo("#va-edge", { x: 0, opacity: 0 }, { x: 1920, opacity: 1, duration: 0.7, ease: "power3.inOut", immediateRender: false }, D - 0.7);

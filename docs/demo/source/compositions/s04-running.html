@@ -16,9 +16,9 @@
           border: 2px solid var(--line); background: rgba(11, 23, 34, 0.92);
         }
         #running-root svg.plot { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
-        #running-root .note { position: absolute; left: 120px; top: 872px; width: 1250px; font-size: 24px; color: var(--ink-mute); }
+        #running-root .note { position: absolute; left: 120px; top: 872px; width: 1250px; font-size: 24px; font-weight: 500; color: var(--ink-soft); }
         #running-root .side { position: absolute; left: 1420px; top: 228px; width: 380px; height: 620px; }
-        #running-root .side .lab { font-family: var(--mono); font-size: 20px; letter-spacing: 0.1em; color: var(--ink-mute); }
+        #running-root .side .lab { font-family: var(--mono); font-size: 22px; letter-spacing: 0.06em; color: var(--ink-mute); }
         #running-root .side .big {
           margin-top: 8px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 58px; font-weight: 700;
           letter-spacing: -0.03em; color: var(--ink);
@@ -59,6 +59,9 @@
         <div class="scene" id="running-in">
           <div class="eyebrow" data-layout-allow-overlap id="running-eyebrow">06 · The system running</div>
           <div class="scene-title" data-layout-allow-overlap id="running-title">The agent's search, round by round.</div>
+          <div class="scene-sub" id="running-sub" style="width: 960px">Each dot is one change tried. Lower = cheaper; green = passed.</div>
+          <div class="scene-title" data-layout-allow-overlap id="running-title-b">The searched plan, re-run on seeds it never saw.</div>
+          <div class="scene-sub" id="running-sub-b">Same promotion quarter, 30 new seeds. Lower cost is better; fill rate = share of demand served.</div>
           <div class="legend" id="running-legend">
             <div>promotion quarter · <b>20 paired seeds</b> per test</div>
             <div><i>●</i> rejected &nbsp; <b>○</b> passed gate &nbsp; <b>●</b> step taken &nbsp; <span style="color: var(--c-eval)">▬ floor −0.5%</span></div>
@@ -101,8 +104,8 @@
           const mk = (tag, a, parent) => { const e = document.createElementNS(NS, tag); Object.entries(a).forEach(([k, v]) => e.setAttribute(k, v)); (parent || svg).appendChild(e); return e; };
           const fmt = (v) => Math.round(v).toLocaleString("en-US");
           const sgn = (v) => (v < 0 ? "−" : "+") + fmt(Math.abs(v));
-          const nice = (lv) => lv === null ? "nothing passes" : lv.replace("review=", "review ").replace("trucks-", "trucks −").replace("trucks+", "trucks +")
-            .replace("promo_aware=yes", "promo-aware").replace("promo_aware=no", "promo off").replace("z=", "z ").replace("cover=", "cover ");
+          const nice = (lv) => lv === null ? "nothing passes" : lv.replace("review=2d", "every 2 days").replace("review=", "review ").replace("trucks-", "trucks −").replace("trucks+", "trucks +")
+            .replace("promo_aware=yes", "promo-aware").replace("promo_aware=no", "promo off").replace("z=", "safety z ").replace("cover=", "cover ");
 
           // plot geometry: x = round, y = cost change vs the plan in hand (thousands)
           const PX = { l: 250, r: 1340, t: 268, b: 748 }, YMIN = -160, YMAX = 320;
@@ -111,7 +114,7 @@
           const Y = (k) => PX.t + ((YMAX - k) / (YMAX - YMIN)) * (PX.b - PX.t);
           [-150, -100, -50, 0, 100, 200, 300].forEach((k) => {
             mk("line", { x1: PX.l, x2: PX.r, y1: Y(k), y2: Y(k), stroke: k === 0 ? "#8494a6" : "rgba(178,191,204,0.12)", "stroke-width": k === 0 ? 2.5 : 1.5, class: "running-grid" });
-            const t = mk("text", { x: PX.l - 14, y: Y(k) + 7, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6", class: "running-grid" });
+            const t = mk("text", { x: PX.l - 14, y: Y(k) + 7, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": 22, fill: "#9fb0c2", class: "running-grid" });
             t.textContent = k === 0 ? "0" : (k > 0 ? "+" : "−") + Math.abs(k) + "k";
           });
           // the gate's floor (0.5% of the plan in hand) per round
@@ -120,7 +123,7 @@
             mk("rect", { x: X(s.round) - colW / 2 + 6, y: Y(0), width: colW - 12, height: Y(f) - Y(0), fill: "rgba(242,196,109,0.22)", class: "running-grid" });
           });
           WALK.steps.forEach((s) => {
-            const t = mk("text", { x: X(s.round), y: PX.b + 36, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6", class: "running-grid" });
+            const t = mk("text", { x: X(s.round), y: PX.b + 36, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 22, fill: "#9fb0c2", class: "running-grid" });
             t.textContent = "round " + s.round;
           });
           // candidate dots
@@ -157,15 +160,16 @@
           });
           const H = WALK.holdout, after = H.baseline_cost + H.cost_diff;
           document.getElementById("running-h-label").textContent = "HOLD-OUT · " + H.n_seeds + " NEW SEEDS · PROMOTION QUARTER";
-          document.getElementById("running-h-plan").textContent = "searched plan: " + WALK.final;
+          document.getElementById("running-h-plan").textContent = "searched plan: order every 2 days · safety z 0.84 · 8 fewer trucks · promo-aware"; // = WALK.final, in words
           document.getElementById("running-h-badge").textContent = "−" + (Math.abs(H.cost_diff / H.baseline_cost) * 100).toFixed(1) + "%";
-          document.getElementById("running-c1").textContent = "fill " + (H.fill_diff_pts < 0 ? "−" : "+") + Math.abs(H.fill_diff_pts).toFixed(2) + " pts";
+          document.getElementById("running-c1").textContent = "fill rate " + (H.fill_diff_pts < 0 ? "−" : "+") + Math.abs(H.fill_diff_pts).toFixed(2) + " pts";
           document.getElementById("running-c2").textContent = "truck use +" + H.util_diff_pts.toFixed(1) + " pts";
 
           // ---------------- choreography ----------------
           tl.fromTo("#running-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#running-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#running-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#running-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
           tl.fromTo("#running-legend", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.6);
           tl.fromTo("#running-chart", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.5);
           tl.fromTo(".running-grid", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.8);
@@ -186,9 +190,11 @@
           });
           // phase 2: hold-out confirmation on seeds the search never saw
           const P2 = 8.3;
-          tl.to("#running-a", { opacity: 0.12, scale: 0.97, duration: 0.6, ease: "power2.inOut" }, P2);
-          tl.to(["#running-title", "#running-legend"], { opacity: 0, duration: 0.3 }, P2);
-          tl.fromTo("#running-hold", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.2);
+          tl.to("#running-a", { opacity: 0, scale: 0.97, duration: 0.5, ease: "power2.in" }, P2); // phase A fully out, no dimmed text behind the card
+          tl.to(["#running-title", "#running-legend", "#running-sub"], { opacity: 0, duration: 0.3 }, P2);
+          tl.fromTo("#running-title-b", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.45);
+          tl.fromTo("#running-sub-b", { opacity: 0 }, { opacity: 1, duration: 0.5 }, P2 + 0.6);
+          tl.fromTo("#running-hold", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.45);
           const hn = document.getElementById("running-h-num");
           const hv = { v: H.baseline_cost };
           hn.textContent = fmt(H.baseline_cost);
@@ -197,7 +203,7 @@
           tl.fromTo("#running-h-badge", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, P2 + 3.5);
           ["#running-c1", "#running-c2", "#running-c3"].forEach((c, i) =>
             tl.fromTo(c, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, P2 + 3.9 + i * 0.25));
-          tl.to("#running-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#running-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["running"] = tl;
         })();
       </script>

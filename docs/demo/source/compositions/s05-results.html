@@ -12,7 +12,7 @@
           background: var(--panel); padding: 44px 34px 36px; display: flex; flex-direction: column; overflow: hidden;
         }
         #results-root .card .bar { position: absolute; left: 0; top: 0; width: 100%; height: 6px; }
-        #results-root .card .layer { font-family: var(--mono); font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; }
+        #results-root .card .layer { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
         #results-root .card .big {
           margin-top: 18px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 88px;
           font-weight: 700; letter-spacing: -0.05em; line-height: 1; white-space: nowrap;
@@ -28,27 +28,28 @@
         #results-root .opt .big, #results-root .opt .layer { color: var(--c-opt); }
         #results-root .mod .bar, #results-root .mod .mini-fill { background: var(--c-model); }
         #results-root .mod .big, #results-root .mod .layer { color: var(--c-model); }
-        #results-root .footnote { position: absolute; left: 120px; top: 840px; font-family: var(--mono); font-size: 24px; color: var(--ink-mute); }
+        #results-root .footnote { position: absolute; left: 120px; top: 840px; width: 1680px; font-size: 26px; font-weight: 500; color: var(--ink-soft); }
       </style>
       <div id="results-root" data-composition-id="results" data-width="1920" data-height="1080">
         <div class="scene" id="results-in">
           <div class="eyebrow" data-layout-allow-overlap id="results-eyebrow">08 · Results · 30 paired seeds per strategy</div>
           <div class="scene-title" data-layout-allow-overlap id="results-title">Real savings found, by a twin that beats naive forecasts.</div>
+          <div class="scene-sub" id="results-sub">Cost and forecast error: lower is better. Fill rate (share of demand served from the shelf): higher is better.</div>
           <div class="cards">
             <div class="card opt" id="results-c1"><div class="bar"></div><div class="layer">single change</div>
               <div class="big"><span id="results-v1">0.0</span>%</div><div class="lab">cost, ordering every 2 days</div>
               <div class="mini"><div class="mini-fill" id="results-m1"></div></div><div class="foot">2,460,080 → 2,318,072</div></div>
             <div class="card opt" id="results-c2"><div class="bar"></div><div class="layer">agent search</div>
-              <div class="big"><span id="results-v2">0.0</span>%</div><div class="lab">cost, searched plan, hold-out</div>
+              <div class="big"><span id="results-v2">0.0</span>%</div><div class="lab">cost, searched plan, on new seeds</div>
               <div class="mini"><div class="mini-fill" id="results-m2"></div></div><div class="foot">2,458,347 → 2,051,146</div></div>
             <div class="card mod" id="results-c3"><div class="bar"></div><div class="layer">twin fidelity</div>
-              <div class="big"><span id="results-v3">0.0</span>%</div><div class="lab">weekly store×SKU WAPE</div>
+              <div class="big"><span id="results-v3">0.0</span>%</div><div class="lab">forecast error (WAPE), weekly per store and SKU</div>
               <div class="mini"><div class="mini-fill" id="results-m3"></div></div><div class="foot">naive: 24.5% · 29.1%</div></div>
             <div class="card mod" id="results-c4"><div class="bar"></div><div class="layer">promo-aware</div>
               <div class="big"><span id="results-v4">0.00</span>%</div><div class="lab">promo fill rate</div>
               <div class="mini"><div class="mini-fill" id="results-m4"></div></div><div class="foot">current policy 98.44%</div></div>
           </div>
-          <div class="footnote" id="results-foot">Promotion quarter · 91 days · 36 stores · 4,320 store-SKUs · numbers from outputs/</div>
+          <div class="footnote" id="results-foot">WAPE = forecast error as a share of actual sales · promotion quarter, 91 days, 36 stores, 4,320 store-SKUs</div>
         </div>
       </div>
       <script>
@@ -58,6 +59,7 @@
           tl.fromTo("#results-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#results-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#results-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#results-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
           const stats = [
             { v: "results-v1", m: "#results-m1", from: 0, to: -5.8, d: 1, r: 2318072 / 2460080 },
             { v: "results-v2", m: "#results-m2", from: 0, to: -16.6, d: 1, r: 2051146 / 2458347 },
@@ -73,7 +75,7 @@
             tl.fromTo(s.m, { scaleX: 1 }, { scaleX: s.r, duration: 1.6, ease: "power3.out" }, at + 0.3);
           });
           tl.fromTo("#results-foot", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2.8);
-          tl.to("#results-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#results-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["results"] = tl;
         })();
       </script>

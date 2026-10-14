@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-14 14:16",
+ "generated": "2026-10-14 18:46",
  "commit": "a4f50f5289cc8c298a8e842f8aadd139c609579c",
  "checks": [
   {
@@ -76,7 +76,7 @@
   },
   {
    "id": "F-10",
-   "shown": "the twin itself is 3.3% low / \u22123.3% demand bias",
+   "shown": "the twin's demand runs 3.3% low / \u22123.3% demand bias",
    "type": "direct",
    "computed": "-3.3%",
    "expect": "-3.3%",
@@ -292,7 +292,7 @@
   },
   {
    "id": "F-37",
-   "shown": "1 review 2d \u2212143,755 \u00b7 2 trucks \u22122 \u221250,217 \u00b7 3 trucks \u22124 \u221256,085 \u00b7 4 trucks \u22126 \u221244,795 \u00b7 5 trucks \u22128 \u221246,004 \u00b7 6 promo-aware \u221220,339 \u00b7 7 z 0.84 \u221249,375 \u00b7 8 nothing passes",
+   "shown": "1 every 2 days \u2212143,755 \u00b7 2 trucks \u22122 \u221250,217 \u00b7 3 trucks \u22124 \u221256,085 \u00b7 4 trucks \u22126 \u221244,795 \u00b7 5 trucks \u22128 \u221246,004 \u00b7 6 promo-aware \u221220,339 \u00b7 7 safety z 0.84 \u221249,375 \u00b7 8 nothing passes",
    "type": "direct",
    "computed": "true",
    "expect": "true",
@@ -340,7 +340,7 @@
   },
   {
    "id": "F-43",
-   "shown": "fill \u22120.13 pts",
+   "shown": "fill rate \u22120.13 pts",
    "type": "direct",
    "computed": "-0.13",
    "expect": "-0.13",
@@ -356,7 +356,7 @@
   },
   {
    "id": "F-45",
-   "shown": "searched plan: z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+   "shown": "searched plan: order every 2 days \u00b7 safety z 0.84 \u00b7 8 fewer trucks \u00b7 promo-aware",
    "type": "direct",
    "computed": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
    "expect": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
@@ -452,15 +452,15 @@
   },
   {
    "id": "F-57",
-   "shown": "\u22120.13 \u00b7 \u2212407,200 cost \u00b7 holds",
-   "type": "direct",
-   "computed": "-0.13 -407,200 True",
-   "expect": "-0.13 -407,200 True",
+   "shown": "Promo quarter \u00b7 tuned on: \u221216.6% cost \u00b7 \u22120.13 \u00b7 TRAP",
+   "type": "derived",
+   "computed": "-0.13 -16.6% True",
+   "expect": "-0.13 -16.6% True",
    "status": "pass"
   },
   {
    "id": "F-58",
-   "shown": "\u22120.21 \u00b7 \u2212398,970 cost \u00b7 fails",
+   "shown": "Normal quarter \u00b7 cost \u2212398,970 \u00b7 \u22120.21 \u00b7 FAILS",
    "type": "direct",
    "computed": "-0.21 -398,970 False",
    "expect": "-0.21 -398,970 False",
@@ -468,7 +468,7 @@
   },
   {
    "id": "F-59",
-   "shown": "\u22121.88 \u00b7 +63,322 cost \u00b7 1,336 late loads \u00b7 fails",
+   "shown": "Fleet 20% down \u00b7 cost +63,322 \u00b7 \u22121.88 \u00b7 FAILS \u00b7 1,336 loads a quarter arrive late",
    "type": "direct",
    "computed": "-1.88 +63,322 1,336 False",
    "expect": "-1.88 +63,322 1,336 False",
@@ -476,7 +476,7 @@
   },
   {
    "id": "F-60",
-   "shown": "0.2-pt limit",
+   "shown": "0.2 limit / past 0.2 pts fails",
    "type": "direct",
    "computed": "true",
    "expect": "true",
@@ -484,8 +484,40 @@
   },
   {
    "id": "F-61",
-   "shown": "Ordering every 2 days alone is the robust win.",
+   "shown": "Re-test every plan on all 3 scenarios \u00b7 The run re-tests the searched plan on every scenario",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-65",
+   "shown": "Promo quarter cost \u2212142,008 \u22120.08 PASS \u00b7 Normal quarter cost \u2212169,129 +0.01 PASS \u00b7 Fleet 20% down cost \u2212200,926 +0.09 PASS",
+   "type": "direct",
+   "computed": "-0.08 -142,008 True / +0.01 -169,129 True / +0.09 -200,926 True",
+   "expect": "-0.08 -142,008 True / +0.01 -169,129 True / +0.09 -200,926 True",
+   "status": "pass"
+  },
+  {
+   "id": "F-66",
+   "shown": "only this change passes all three",
    "type": "derived",
+   "computed": "['order every 2 days']",
+   "expect": "['order every 2 days']",
+   "status": "pass"
+  },
+  {
+   "id": "F-67",
+   "shown": "saves 142,008 to 200,926 a quarter, fill within the limit",
+   "type": "derived",
+   "computed": "142,008 to 200,926 True",
+   "expect": "142,008 to 200,926 True",
+   "status": "pass"
+  },
+  {
+   "id": "F-68",
+   "shown": "The search still tunes on one scenario. Next: score a weighted mix that includes breakdowns.",
+   "type": "direct",
    "computed": "true",
    "expect": "true",
    "status": "pass"

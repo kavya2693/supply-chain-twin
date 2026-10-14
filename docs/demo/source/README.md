@@ -15,7 +15,7 @@ Everything needed to rebuild the silent walkthrough (`docs/demo/demo.mp4`) and t
 | `compositions/s03-architecture.html` | Slide 05, the layered architecture diagram (`BANDS`, `NODES`, `WIRES`, `LABELS`) |
 | `compositions/s04-running.html` | Slide 06, the agent's search round by round and the hold-out result (data injected as `WALK`) |
 | `compositions/value.html` | Slide 07, the planner's change scorecard and the DC-to-store scene (data injected as `SHEET`) |
-| `compositions/s05-results.html`, `s06-twist.html`, `s07-end.html` | Slides 08-10, results, what didn't win, end card |
+| `compositions/s05-results.html`, `s06-twist.html`, `s07-end.html` | Slides 08-10, results, the lesson and the fix the repo makes, end card |
 | `assets/search_walk.json` | Every candidate the search tested, exported from `outputs/search_neighbour_promo.*` by `tools/export_search_walk.py` |
 | `assets/change_sheet.json` | The seven named strategies on the promotion quarter (30 seeds) plus the store list, exported by `tools/export_change_sheet.py` |
 | `audit/facts.yaml` | Every figure (F-xx), assumption (A-xx), slide text and check expression used by the report |
@@ -52,7 +52,7 @@ python3 docs/demo/source/tools/inject_sheet.py docs/demo/source/assets/search_wa
 python3 docs/demo/source/tools/inject_sheet.py docs/demo/source/assets/change_sheet.json \
   docs/demo/source/compositions/value.html --name SHEET
 
-# 3. render (90.6 s, 1920x1080, 30 fps, silent) and compress
+# 3. render (92.8 s, 1920x1080, 30 fps, silent) and compress
 cd docs/demo/source
 npx --yes hyperframes@0.8.156 check
 npx --yes hyperframes@0.8.156 render -f 30 -q looks -o renders/supply-chain-twin-master.mp4
