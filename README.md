@@ -8,9 +8,9 @@ Test replenishment, promotion and fleet-size changes on a digital twin of a reta
 before they reach a single store, and accept only the ones that beat the current policy by
 more than the twin's own error.
 
-[![90-second silent walkthrough: the retail problem, how the twin works, the architecture, the agent's search round by round, the planner's change scorecard, the results and what didn't win](docs/demo/demo.gif)](docs/demo/demo.mp4)
+[![90-second silent walkthrough: the retail problem, how the twin works, the architecture, the agent's search round by round, the planner's change scorecard, the results and what didn't win](docs/demo/demo.gif)](https://kavya2693.github.io/work-demos/supply-chain-twin.mp4)
 
-*~90-second silent walkthrough. Click for the full video ([MP4, 6 MB](docs/demo/demo.mp4)).*
+*~90-second silent walkthrough. [Play the full video](https://kavya2693.github.io/work-demos/supply-chain-twin.mp4) · [download the MP4, 6 MB](docs/demo/demo.mp4).*
 
 📄 **Audit report:** every figure and assumption in the video, traced to its source — [PDF](docs/demo/AUDIT_REPORT.pdf) · [Word](docs/demo/AUDIT_REPORT.docx) · [Markdown](docs/demo/AUDIT_REPORT.md)
 
