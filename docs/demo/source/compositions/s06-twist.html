@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #twist-root { position: absolute; inset: 0; }
+        #twist-root .eyebrow { color: var(--c-risk); }
+        #twist-root .sub { position: absolute; left: 120px; top: 200px; font-size: 32px; color: var(--ink-soft); }
+        #twist-root .bars { position: absolute; left: 120px; top: 310px; width: 1680px; }
+        #twist-root .row { display: flex; align-items: center; height: 112px; }
+        #twist-root .who { width: 430px; white-space: nowrap; font-size: 36px; font-weight: 700; color: var(--ink); }
+        #twist-root .who small { display: block; font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--ink-mute); }
+        #twist-root .track { position: relative; width: 1000px; height: 44px; border-radius: 8px; background: rgba(178, 191, 204, 0.08); }
+        #twist-root .fill { position: absolute; left: 0; top: 0; height: 44px; border-radius: 8px; background: var(--ink-mute); transform-origin: left center; }
+        #twist-root .val { width: 130px; text-align: right; font-family: var(--mono); font-size: 44px; font-weight: 700; color: var(--ink-soft); }
+        #twist-root .row { height: 128px; }
+        #twist-root .ok .fill { background: var(--c-opt); }
+        #twist-root .ok .val, #twist-root .ok .vd { color: var(--c-opt); }
+        #twist-root .warn .fill { background: var(--c-eval); }
+        #twist-root .warn .val, #twist-root .warn .vd { color: var(--c-eval); }
+        #twist-root .bad .fill { background: var(--c-risk); }
+        #twist-root .bad .val, #twist-root .bad .vd { color: var(--c-risk); }
+        #twist-root .vd { width: 120px; text-align: right; font-family: var(--mono); font-size: 30px; font-weight: 700; }
+        #twist-root .limit { position: absolute; left: 649px; top: 300px; width: 3px; height: 420px; background: repeating-linear-gradient(var(--ink-soft) 0 10px, transparent 10px 18px); }
+        #twist-root .limit span { position: absolute; left: 12px; top: -6px; font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap; }
+        
+        
+        
+        
+        #twist-root .verdict {
+          position: absolute; left: 120px; top: 806px; width: 1680px; padding: 22px 28px; border-radius: 12px;
+          border: 2px solid rgba(255, 138, 115, 0.45); background: rgba(255, 138, 115, 0.07);
+          font-size: 30px; line-height: 1.4; color: var(--ink);
+        }
+        #twist-root .verdict b { color: var(--c-risk); }
+      </style>
+      <div id="twist-root" data-composition-id="twist" data-width="1920" data-height="1080">
+        <div class="scene" id="twist-in">
+          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · What didn't win</div>
+          <div class="scene-title" data-layout-allow-overlap id="twist-title">The searched plan breaks when trucks break down.</div>
+          <div class="sub" id="twist-sub">Searched plan re-tested on 30 new seeds per scenario · change in fill rate (points)</div>
+          <div class="limit" id="twist-limit" data-layout-allow-overflow><span>0.2-pt limit</span></div>
+          <div class="bars">
+            <div class="row ok" id="twist-r1"><div class="who">Promotion quarter<small>tuned on · −407,200 cost</small></div>
+              <div class="track"><div class="fill" id="twist-b1" style="width: 67px"></div></div><div class="val">−0.13</div><div class="vd">holds</div></div>
+            <div class="row warn" id="twist-r2"><div class="who">Normal quarter<small>−398,970 cost</small></div>
+              <div class="track"><div class="fill" id="twist-b2" style="width: 106px"></div></div><div class="val">−0.21</div><div class="vd">fails</div></div>
+            <div class="row bad" id="twist-r3"><div class="who">20% of fleet down<small>+63,322 cost · 1,336 late loads</small></div>
+              <div class="track"><div class="fill" id="twist-b3" style="width: 939px"></div></div><div class="val">−1.88</div><div class="vd">fails</div></div>
+          </div>
+          <div class="verdict" id="twist-verdict"><b>Why:</b> the search cut trucks until the base case was just covered, so nothing is left for breakdowns. Ordering every 2 days alone is the robust win.</div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 7.2;
+          tl.fromTo("#twist-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#twist-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#twist-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#twist-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
+          [1, 2, 3].forEach((n, i) => {
+            tl.fromTo("#twist-r" + n, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.15);
+            tl.fromTo("#twist-b" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 1.0 + i * 0.15);
+          });
+          tl.fromTo("#twist-limit", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.8);
+          tl.fromTo("#twist-verdict", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.4);
+          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["twist"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

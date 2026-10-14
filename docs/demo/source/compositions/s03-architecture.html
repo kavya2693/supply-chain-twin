@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #arch-root { position: absolute; inset: 0; }
+        #arch-root .diagram { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 1060px 620px; }
+        #arch-root svg.wires { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #arch-root .strip { position: absolute; left: 316px; width: 1528px; border-radius: 14px; background: rgba(127, 168, 255, 0.025); border: 1px solid rgba(178, 191, 204, 0.07); }
+        #arch-root .gut { position: absolute; left: 90px; width: 210px; padding-left: 18px; }
+        #arch-root .gut .bar { position: absolute; left: 0; top: 2px; width: 6px; height: 56px; border-radius: 3px; }
+        #arch-root .gut .n { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.12em; }
+        #arch-root .gut .c { margin-top: 6px; font-family: var(--mono); font-size: 20px; color: var(--ink-mute); white-space: nowrap; }
+        #arch-root .node {
+          position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 4px;
+          padding: 14px 18px 0; border: 2px solid var(--line); border-radius: 12px; background: var(--panel);
+        }
+        #arch-root .node.cyl { border: none; background: none; padding-top: 16px; align-items: center; text-align: center; }
+        #arch-root .node.cyl svg { position: absolute; left: 0; top: 0; overflow: visible; }
+        #arch-root .node.cyl .t, #arch-root .node.cyl .s { position: relative; }
+        #arch-root .node .t { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+        #arch-root .node.cyl .t { font-size: 24px; }
+        #arch-root .node .s { font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap; }
+        #arch-root .node .s.nfr { color: var(--c-eval); }
+        #arch-root .node .s.ok { color: var(--c-opt); }
+        #arch-root .node .f {
+          position: absolute; left: 14px; top: -15px; font-family: var(--mono); font-size: 20px; line-height: 24px; padding: 1px 9px;
+          border-radius: 6px; background: var(--bg); border: 2px solid var(--line); white-space: nowrap;
+        }
+        #arch-root .node.cyl .f { top: -10px; left: 50%; transform: translateX(-50%); }
+        #arch-root .L-data { border-color: rgba(127, 168, 255, 0.55); }
+        #arch-root .L-data .f { color: var(--c-data); border-color: rgba(127, 168, 255, 0.55); }
+        #arch-root .L-model { border-color: rgba(185, 162, 255, 0.6); }
+        #arch-root .L-model .f { color: var(--c-model); border-color: rgba(185, 162, 255, 0.6); }
+        #arch-root .L-opt { border-color: rgba(63, 216, 168, 0.6); }
+        #arch-root .L-opt .f { color: var(--c-opt); border-color: rgba(63, 216, 168, 0.6); }
+        #arch-root .L-eval { border-color: rgba(242, 196, 109, 0.65); }
+        #arch-root .L-eval .f { color: var(--c-eval); border-color: rgba(242, 196, 109, 0.65); }
+        #arch-root .node.ext { border-style: dashed; background: rgba(185, 162, 255, 0.05); }
+        #arch-root .node.human { border-style: dashed; border-color: rgba(238, 242, 246, 0.55); background: rgba(238, 242, 246, 0.04); padding-left: 86px; }
+        #arch-root .node.human svg { position: absolute; left: 22px; top: 50%; margin-top: -26px; width: 48px; height: 52px; }
+        #arch-root .node.big { border-width: 3px; background: #141a33; }
+        #arch-root .node.gate { border: 3px solid var(--c-opt); background: #0f2629; box-shadow: 0 0 30px rgba(63, 216, 168, 0.12); }
+        #arch-root .node.gate .t { font-size: 30px; }
+        #arch-root .node.gate { padding-top: 6px; }
+        #arch-root .dp {
+          position: absolute; right: 14px; top: -15px; font-family: var(--mono); font-size: 20px; line-height: 24px; padding: 1px 9px;
+          border-radius: 6px; background: var(--c-opt-deep); color: #fff; white-space: nowrap;
+        }
+        #arch-root .ctr {
+          position: absolute; right: 14px; bottom: -42px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 20px;
+          line-height: 24px; padding: 1px 10px; border-radius: 6px; background: var(--bg); border: 2px solid rgba(63, 216, 168, 0.6);
+          color: var(--c-opt); white-space: nowrap;
+        }
+        #arch-root .wl { position: absolute; font-family: var(--mono); font-size: 20px; line-height: 24px; white-space: nowrap; }
+        #arch-root .wl.pill { padding: 1px 10px; border-radius: 999px; background: var(--bg); border: 2px solid currentColor; }
+        #arch-root .wl.pill span { color: var(--ink); }
+        #arch-root .legend { position: absolute; left: 330px; top: 912px; width: 700px; }
+        #arch-root .legend .r { display: flex; gap: 30px; height: 34px; align-items: center; font-family: var(--mono); font-size: 20px; color: var(--ink-soft); }
+        #arch-root .legend .r span { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        #arch-root .legend svg { width: 46px; height: 10px; }
+        #arch-root .crit {
+          position: absolute; right: 120px; top: 190px; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: 0.1em;
+          padding: 3px 14px; border-radius: 6px; color: #0a1119; background: var(--c-opt); white-space: nowrap;
+        }
+      </style>
+
+      <div id="arch-root" data-composition-id="arch" data-width="1920" data-height="1080">
+        <div class="scene" id="arch-in">
+          <div class="eyebrow" data-layout-allow-overlap id="arch-eyebrow">05 · Architecture</div>
+          <div class="scene-title" data-layout-allow-overlap id="arch-title">Proposers only propose. A paired-seed gate decides.</div>
+          <div class="crit" id="arch-crit">CRITICAL PATH · MAKE RUN ≈ 2.5 MIN</div>
+          <div class="diagram" id="arch-diagram">
+            <div id="arch-strips"></div>
+            <svg class="wires" viewBox="0 0 1920 1080" id="arch-svg"><defs id="arch-defs"></defs></svg>
+            <div id="arch-nodes"></div>
+            <div id="arch-labels"></div>
+            <div class="legend" id="arch-legend">
+              <div class="r">
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#b2bfcc" stroke-width="4" /></svg>in-process call</span>
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#b2bfcc" stroke-width="4" stroke-dasharray="9 6" /></svg>file read / write (batch)</span>
+              </div>
+              <div class="r">
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#b2bfcc" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round" /></svg>HTTP, optional</span>
+                <span><svg viewBox="0 0 46 10"><line x1="2" y1="5" x2="44" y2="5" stroke="#ff8a73" stroke-width="4" /></svg>fallback path</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 16;
+          const NS = "http://www.w3.org/2000/svg";
+          const COL = { data: "#7fa8ff", model: "#b9a2ff", opt: "#3fd8a8", eval: "#f2c46d", risk: "#ff8a73", ink: "#eef2f6" };
+          const FILL = { data: "#0f1a26", model: "#141a33", opt: "#0f2629", eval: "#1d1a12" };
+
+          /* ---------------- layers (top -> bottom) ---------------- */
+          const BANDS = [
+            { y: 236, h: 104, name: "SOURCES", cap: "synthetic, seeded", c: "data" },
+            { y: 398, h: 112, name: "TWIN BUILD", cap: "batch, per run", c: "data" },
+            { y: 568, h: 112, name: "SIMULATION", cap: "SimPy, in-process", c: "model" },
+            { y: 738, h: 124, name: "DECISION", cap: "paired-seed gate", c: "opt" },
+            { y: 908, h: 92, name: "OUTPUT", cap: "files + a person", c: "eval" },
+          ];
+          /* ---------------- components: every box names its module in src/supply_twin/ ---------------- */
+          const NODES = [
+            // band 0: the three source systems (4 files written by scripts/generate_data.py)
+            { id: "fms", b: 0, x: 330, w: 352, kind: "cyl", L: "data", f: "FMS", t: "28 trucks", s: ["fms_fleet.csv"] },
+            { id: "items", b: 0, x: 706, w: 352, kind: "cyl", L: "data", f: "MMS", t: "120 SKUs · 8 categories", s: ["mms_items.csv"] },
+            { id: "locs", b: 0, x: 1082, w: 352, kind: "cyl", L: "data", f: "MMS", t: "36 stores · 2 DCs", s: ["mms_locations.csv"] },
+            { id: "oms", b: 0, x: 1458, w: 352, kind: "cyl", L: "data", f: "OMS", t: "3.1M lines · 2 years", s: ["oms_order_lines.csv.gz"] },
+            // band 1: twin build
+            { id: "dq", b: 1, x: 330, w: 270, kind: "cyl", L: "data", t: "Data quality", s: ["data_quality.json"], minor: true },
+            { id: "twin", b: 1, x: 680, w: 330, L: "data", f: "twin.py", t: "Join + repair", s: ["build_twin() · pandas"] },
+            { id: "state", b: 1, x: 1110, w: 300, kind: "cyl", L: "model", f: "TwinState", t: "Demand model", s: ["4,320 store-SKU rates"] },
+            { id: "fid", b: 1, x: 1480, w: 350, L: "eval", f: "fidelity.py", t: "Backtest · 13 weeks", s: ["WAPE 17.8% · bias −3.3%"] },
+            // band 2: simulation
+            { id: "scen", b: 2, x: 330, w: 290, L: "model", f: "sim.py", t: "3 scenarios", s: ["base · promo · outage"], minor: true },
+            { id: "sim", b: 2, x: 720, w: 570, L: "model", big: true, f: "sim.py · simulate()", t: "SimPy quarter", s: ["91 days · sell 21:00 · trucks 05–19 h"], nfr: "≈0.1–0.2 s per simulated quarter" },
+            { id: "cache", b: 2, x: 1390, w: 280, kind: "cyl", L: "opt", f: "harness.py", t: "Run cache", s: ["1,930 runs · pool ≤ 4"] },
+            // band 3: decision
+            { id: "llm", b: 3, x: 330, w: 270, L: "model", kind: "ext", f: "llm.py", t: "Ollama LLM", s: ["optional, local"], nfr: "180 s timeout", minor: true },
+            { id: "agent", b: 3, x: 690, w: 270, L: "opt", f: "agent.py", t: "Strategy agent", s: ["neighbour proposer", "one lever per step"] },
+            { id: "gate", b: 3, x: 1060, w: 460, L: "opt", kind: "gate", f: "harness.py", t: "Acceptance gate", s: ["accept if cost CI < −0.5%", "and fill loss < 0.2 pts"] },
+            { id: "retest", b: 3, x: 1590, w: 240, L: "eval", f: "cli.py", t: "Re-test", s: ["30 hold-out seeds", "× 3 scenarios"] },
+            // band 4: output
+            { id: "planner", b: 4, x: 1080, w: 340, kind: "human", t: "Planner", s: ["rolls it out, or not"] },
+            { id: "out", b: 4, x: 1500, w: 330, kind: "cyl", L: "eval", t: "outputs/", s: ["CSV + JSON tables"] },
+          ];
+          /* ---------------- edges: pts = orthogonal polyline; st = call | file | http ---------------- */
+          const WIRES = [
+            { id: "fms", pts: [[506, 340], [506, 369], [845, 369], [845, 398]], st: "file", c: "data", build: 1.75, crit: true },
+            { id: "items", pts: [[882, 340], [882, 369], [845, 369], [845, 398]], st: "file", c: "data", build: 1.75, crit: true },
+            { id: "locs", pts: [[1258, 340], [1258, 369], [845, 369], [845, 398]], st: "file", c: "data", build: 1.75, crit: true },
+            { id: "oms", pts: [[1634, 340], [1634, 369], [845, 369], [845, 398]], st: "file", c: "data", build: 1.75, crit: true },
+            { id: "omsfid", pts: [[1634, 340], [1634, 398]], st: "file", c: "data", build: 2.6, crit: true },
+            { id: "dq", pts: [[680, 454], [600, 454]], st: "file", c: "data", build: 2.85 },
+            { id: "state", pts: [[1010, 454], [1110, 454]], st: "call", c: "data", build: 2.85, crit: true },
+            { id: "statesim", pts: [[1150, 510], [1150, 568]], st: "call", c: "model", build: 3.95, crit: true },
+            { id: "fidsim", pts: [[1655, 510], [1655, 539], [1250, 539], [1250, 568]], st: "call", c: "eval", build: 3.95, crit: true },
+            { id: "scen", pts: [[620, 624], [720, 624]], st: "call", c: "model", build: 3.95 },
+            { id: "simcache", pts: [[1290, 624], [1390, 624]], st: "call", c: "model", build: 3.95, crit: true },
+            { id: "llm", pts: [[600, 780], [690, 780]], st: "http", c: "model", build: 5.05 },
+            { id: "fallback", pts: [[465, 862], [465, 885], [825, 885], [825, 862]], st: "call", c: "risk", build: 5.25 },
+            { id: "agentgate", pts: [[960, 780], [1060, 780]], st: "call", c: "opt", build: 5.05, crit: true },
+            { id: "gateagent", pts: [[1060, 832], [960, 832]], st: "call", c: "opt", build: 5.25, crit: true },
+            { id: "gatesim", pts: [[1150, 738], [1150, 680]], st: "call", c: "opt", build: 5.05, crit: true },
+            { id: "cachegate", pts: [[1450, 680], [1450, 738]], st: "call", c: "opt", build: 5.05, crit: true },
+            { id: "gateretest", pts: [[1520, 800], [1590, 800]], st: "call", c: "opt", build: 5.25, crit: true },
+            { id: "retestout", pts: [[1710, 862], [1710, 908]], st: "file", c: "eval", build: 6.1, crit: true },
+            { id: "outplanner", pts: [[1500, 954], [1420, 954]], st: "file", c: "eval", build: 6.1, crit: true },
+          ];
+          // labels: what flows on each edge (x,y = anchor; a = left | right | center; pill = label sits on the line)
+          const LABELS = [
+            { w: "oms", x: 1060, y: 369, a: "center", pill: true, c: "data", txt: "load_sources() · <span>4 CSV files</span>" },
+            { w: "dq", x: 640, y: 428, a: "center", c: "data", txt: "writes" },
+            { w: "state", x: 1060, y: 428, a: "center", c: "data", txt: "rates" },
+            { w: "statesim", x: 1138, y: 539, a: "right", c: "model", txt: "rates · fleet · distances" },
+            { w: "fidsim", x: 1452, y: 539, a: "center", pill: true, c: "eval", txt: "σ = 0.104 <span>demand error</span>" },
+            { w: "scen", x: 670, y: 598, a: "center", c: "model", txt: "Scenario" },
+            { w: "simcache", x: 1340, y: 598, a: "center", c: "model", txt: "metrics" },
+            { w: "gatesim", x: 1138, y: 709, a: "right", c: "opt", txt: "(strategy, scenario, seed) jobs" },
+            { w: "cachegate", x: 1462, y: 709, a: "left", c: "opt", txt: "cost · fill · util / seed" },
+            { w: "llm", x: 645, y: 754, a: "center", c: "model", txt: "JSON" },
+            { w: "agentgate", x: 1010, y: 754, a: "center", c: "opt", txt: "Strategy" },
+            { w: "gateagent", x: 1010, y: 848, a: "center", c: "opt", txt: "verdict" },
+            { w: "fallback", x: 645, y: 885, a: "center", pill: true, c: "risk", txt: "bad reply → <span>neighbours</span>" },
+            { w: "gateretest", x: 1555, y: 774, a: "center", c: "opt", txt: "plan" },
+            { w: "retestout", x: 1698, y: 885, a: "right", c: "eval", txt: "writes CSV" },
+            { w: "outplanner", x: 1460, y: 928, a: "center", c: "eval", txt: "reads" },
+          ];
+
+          /* ---------------- build DOM ---------------- */
+          const strips = document.getElementById("arch-strips");
+          BANDS.forEach((b, i) => {
+            strips.insertAdjacentHTML("beforeend",
+              '<div class="strip" id="arch-strip' + i + '" style="top:' + (b.y - 12) + "px;height:" + (b.h + 24) + 'px"></div>' +
+              '<div class="gut" id="arch-gut' + i + '" style="top:' + (b.y + b.h / 2 - 30) + 'px"><div class="bar" style="background:' + COL[b.c] + '"></div>' +
+              '<div class="n" style="color:' + COL[b.c] + '">' + b.name + '</div><div class="c">' + b.cap + "</div></div>");
+          });
+          const nodesEl = document.getElementById("arch-nodes");
+          const PERSON = '<svg viewBox="0 0 48 52"><circle cx="24" cy="12" r="10" fill="#eef2f6"/><path d="M4 52v-8a20 16 0 0 1 40 0v8z" fill="#eef2f6"/></svg>';
+          NODES.forEach((n) => {
+            const b = BANDS[n.b], h = n.h || b.h, y = b.y;
+            const cls = ["node", n.L ? "L-" + n.L : "", n.kind || "", n.big ? "big" : ""].join(" ");
+            let inner = "";
+            if (n.kind === "cyl") {
+              const w = n.w, ry = 14, c = COL[n.L], f = FILL[n.L];
+              inner += '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + " " + h + '">' +
+                '<path d="M1 ' + ry + "V" + (h - ry) + "A" + (w / 2 - 1) + " " + ry + " 0 0 0 " + (w - 1) + " " + (h - ry) + "V" + ry + '" fill="' + f + '" stroke="' + c + '" stroke-opacity="0.7" stroke-width="2"/>' +
+                '<ellipse cx="' + w / 2 + '" cy="' + ry + '" rx="' + (w / 2 - 1) + '" ry="' + (ry - 1) + '" fill="#132131" stroke="' + c + '" stroke-opacity="0.7" stroke-width="2"/></svg>';
+            }
+            if (n.kind === "human") inner += PERSON;
+            if (n.f) inner += '<div class="f">' + n.f + "</div>";
+            if (n.kind === "gate") inner += '<div class="dp">◆ decision point</div><div class="ctr" id="arch-ctr">round 0 · 0 tested</div>';
+            inner += '<div class="t">' + n.t + "</div>";
+            (n.s || []).forEach((s) => (inner += '<div class="s' + (n.kind === "gate" ? " ok" : "") + '">' + s + "</div>"));
+            if (n.nfr) inner += '<div class="s nfr">' + n.nfr + "</div>";
+            nodesEl.insertAdjacentHTML("beforeend",
+              '<div class="' + cls + '" id="n-' + n.id + '" style="left:' + n.x + "px;top:" + y + "px;width:" + n.w + "px;height:" + h + 'px">' + inner + "</div>");
+          });
+          const labelsEl = document.getElementById("arch-labels");
+          LABELS.forEach((l, i) => {
+            const tx = l.a === "center" ? "translate(-50%, -50%)" : l.a === "right" ? "translate(-100%, -50%)" : "translate(0, -50%)";
+            labelsEl.insertAdjacentHTML("beforeend",
+              '<div class="wl' + (l.pill ? " pill" : "") + '" id="arch-l' + i + '" style="left:' + l.x + "px;top:" + l.y + "px;color:" + COL[l.c] + ";transform:" + tx + '">' + l.txt + "</div>");
+          });
+
+          // wires: a styled path, revealed by an animated mask so dashed/dotted styles keep their pattern
+          const svg = document.getElementById("arch-svg"), defs = document.getElementById("arch-defs");
+          const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); (parent || svg).appendChild(e); return e; };
+          Object.entries(COL).forEach(([k, c]) => {
+            const m = mk("marker", { id: "arch-ah-" + k, viewBox: "0 0 12 12", refX: "10", refY: "6", markerWidth: "12", markerHeight: "12", markerUnits: "userSpaceOnUse", orient: "auto" }, defs);
+            mk("path", { d: "M0 0L12 6L0 12z", fill: c }, m);
+          });
+          const lenOf = (pts) => pts.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
+          const W = {};
+          WIRES.forEach((w) => {
+            const d = "M" + w.pts.map((q) => q.join(" ")).join(" L");
+            const L = lenOf(w.pts);
+            const mask = mk("mask", { id: "arch-m-" + w.id, maskUnits: "userSpaceOnUse", x: "0", y: "0", width: "1920", height: "1080" }, defs);
+            const mp = mk("path", { d, fill: "none", stroke: "#fff", "stroke-width": "20", "stroke-linecap": "square", "stroke-dasharray": L + " " + L, "stroke-dashoffset": L }, mask);
+            const dash = w.st === "file" ? "10 7" : w.st === "http" ? "2 8" : "none";
+            const p = mk("path", { d, id: "arch-w-" + w.id, fill: "none", stroke: COL[w.c], "stroke-width": "3.5", "stroke-linejoin": "round",
+              "stroke-linecap": w.st === "http" ? "round" : "butt", "stroke-dasharray": dash, "marker-end": "url(#arch-ah-" + w.c + ")", mask: "url(#arch-m-" + w.id + ")", opacity: "0.8" });
+            W[w.id] = { ...w, L, el: p, mp };
+          });
+
+          /* ---------------- choreography ---------------- */
+          tl.fromTo("#arch-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#arch-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#arch-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#arch-diagram", { scale: 0.985 }, { scale: 1, duration: D, ease: "sine.out" }, 0);
+          tl.fromTo("#arch-legend", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 6.0);
+
+          // 1. build layer by layer
+          const BAND_AT = [1.0, 2.1, 3.2, 4.3, 5.5];
+          BANDS.forEach((b, i) => {
+            const at = BAND_AT[i];
+            tl.fromTo("#arch-strip" + i, { opacity: 0 }, { opacity: 1, duration: 0.5 }, at);
+            tl.fromTo("#arch-gut" + i, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, at);
+            NODES.filter((n) => n.b === i).forEach((n, k) =>
+              tl.fromTo("#n-" + n.id, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, at + 0.1 + k * 0.1));
+          });
+          WIRES.forEach((w) => {
+            const o = W[w.id];
+            tl.fromTo(o.mp, { attr: { "stroke-dashoffset": o.L } }, { attr: { "stroke-dashoffset": 0 }, duration: Math.max(0.35, o.L / 1100), ease: "power2.inOut" }, w.build);
+          });
+          LABELS.forEach((l, i) => tl.fromTo("#arch-l" + i, { opacity: 0 }, { opacity: 1, duration: 0.4 }, W[l.w].build + 0.25));
+
+          // 2. data packets along the edges, in execution order
+          const packet = (wid, at, speed) => {
+            const o = W[wid], pts = o.pts;
+            const travel = Math.max(0.28, o.L / (speed || 650));
+            const c = mk("circle", { r: "7", cx: pts[0][0], cy: pts[0][1], fill: COL[o.c], opacity: "0" });
+            const kf = [];
+            for (let i = 1; i < pts.length; i++) {
+              const seg = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+              kf.push({ attr: { cx: pts[i][0], cy: pts[i][1] }, duration: (travel * seg) / o.L, ease: "none" });
+            }
+            tl.fromTo(c, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.08 }, at);
+            tl.to(c, { keyframes: kf }, at);
+            tl.to(c, { attr: { opacity: 0 }, duration: 0.12 }, at + travel - 0.04);
+            return at + travel;
+          };
+          const P0 = 6.9;
+          ["fms", "items", "locs", "oms"].forEach((id) => packet(id, P0, 1300));
+          packet("omsfid", P0 + 0.05, 300);
+          packet("dq", P0 + 0.95);
+          packet("state", P0 + 0.95);
+          packet("statesim", P0 + 1.35);
+          packet("fidsim", P0 + 1.25, 1300);
+          packet("scen", P0 + 1.35);
+          // the search loop: agent -> gate -> simulator -> cache -> gate -> agent, three visible laps (8 real rounds)
+          const LOOP0 = P0 + 1.85, LAP = 1.3;
+          const ctr = document.getElementById("arch-ctr");
+          const ROUNDS = [[8, 1], [17, 2], [26, 3], [35, 4], [44, 5], [53, 6], [62, 7], [71, 8]]; // cumulative tested, round
+          for (let lap = 0; lap < 3; lap++) {
+            const t = LOOP0 + lap * LAP;
+            if (lap === 0) { packet("llm", t - 0.35, 380); packet("fallback", t - 0.05, 1300); }
+            packet("agentgate", t);
+            packet("gatesim", t + 0.3);
+            packet("simcache", t + 0.58);
+            packet("cachegate", t + 0.86);
+            packet("gateagent", t + 1.0);
+          }
+          const cv = { v: 0 };
+          tl.to(cv, { v: 7.999, duration: 3 * LAP, ease: "none", onUpdate: () => {
+            const r = ROUNDS[Math.min(7, Math.floor(cv.v))];
+            ctr.textContent = "round " + r[1] + " · " + r[0] + " tested";
+          } }, LOOP0);
+          tl.fromTo("#n-gate", { boxShadow: "0 0 30px rgba(63,216,168,0.12)" }, { boxShadow: "0 0 60px rgba(63,216,168,0.4)", duration: LAP / 2, ease: "sine.inOut", yoyo: true, repeat: 5 }, LOOP0);
+          const OUT0 = LOOP0 + 3 * LAP + 0.05;
+          packet("gateretest", OUT0);
+          packet("retestout", OUT0 + 0.3);
+          packet("outplanner", OUT0 + 0.6);
+
+          // 3. critical path: dim everything off it, brighten the edges on it
+          const CP = OUT0 + 1.0;
+          const off = NODES.filter((n) => n.minor).map((n) => "#n-" + n.id);
+          tl.to(off, { opacity: 0.25, duration: 0.5 }, CP);
+          tl.to("#arch-strips", { opacity: 0.5, duration: 0.5 }, CP);
+          WIRES.forEach((w, i) => {
+            if (w.crit) tl.to(W[w.id].el, { attr: { opacity: 1, "stroke-width": 5.5 }, duration: 0.5 }, CP + (i % 5) * 0.04);
+            else tl.to(W[w.id].el, { attr: { opacity: 0.2 }, duration: 0.5 }, CP);
+          });
+          LABELS.forEach((l, i) => { if (!W[l.w].crit) tl.to("#arch-l" + i, { opacity: 0.25, duration: 0.5 }, CP); });
+          tl.fromTo("#arch-crit", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, CP + 0.2);
+
+          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["arch"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

@@ -1,0 +1,476 @@
+# Audit facts for the supply-chain-twin demo video.
+# Read by docs/demo/source/tools/build_audit_report.py.
+#
+# Check expressions are Python, evaluated with these helpers (paths relative to the repo root;
+# a "demo:" prefix means relative to the demo project folder):
+#   R(path) -> pandas DataFrame from CSV      J(path) -> parsed JSON
+#   row(path, **eq) -> the single CSV row matching all equalities (a pandas Series)
+#   T(path) -> file text                      grep(path, regex) -> True/False
+# A check passes when fmt.format(value) == expect (or, with fmt "bool", when value is True).
+# Slides print negative numbers with a typographic minus (−); expect strings use the ASCII "-".
+
+project:
+  name: supply-chain-twin
+  title: "supply-chain-twin: demo video audit report"
+  repo_url: https://github.com/kavya2693/supply-chain-twin
+  repo_dir: ../../../..          # paths are relative to this file
+  demo_dir: ..
+  demo_display: docs/demo/source
+  out_dir: ../..
+  video: docs/demo/demo.mp4
+  video_duration_s: 90.6
+  outputs_dir: outputs
+  venv_python: .venv/bin/python
+  version_packages: [simpy, pandas, numpy, scipy]
+  regenerate:
+    - "make run                                   # data/ + outputs/*.csv|json (about 2.5 min on 4 cores)"
+    - "python3 docs/demo/source/tools/export_search_walk.py docs/demo/source/assets/search_walk.json"
+    - "PYTHONPATH=src .venv/bin/python docs/demo/source/tools/export_change_sheet.py docs/demo/source/assets/change_sheet.json"
+    - "python3 docs/demo/source/tools/inject_sheet.py docs/demo/source/assets/search_walk.json docs/demo/source/compositions/s04-running.html --name WALK"
+    - "python3 docs/demo/source/tools/inject_sheet.py docs/demo/source/assets/change_sheet.json docs/demo/source/compositions/value.html --name SHEET"
+    - "cd docs/demo/source && npx --yes hyperframes@0.8.156 check && npx --yes hyperframes@0.8.156 render -f 30 -q looks -o renders/supply-chain-twin-master.mp4 && cd -"
+    - "ffmpeg -y -i docs/demo/source/renders/supply-chain-twin-master.mp4 -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p -movflags +faststart -an docs/demo/demo.mp4"
+    - "python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/facts.yaml   # stills, checks, MD/DOCX/PDF"
+  seeds: {data_generator: 7, search_seeds: "0-19", evaluation_seeds: "1000-1029", holdout_seeds: "5000-5029"}
+  run_time: "outputs/run_log.txt: make run 2:26.26 total (about 2.4 min) on the author's laptop; README says about 3 minutes on 4 cores"
+
+assumptions:
+  - id: A-01
+    statement: "All data is synthetic, written by a seeded generator (seed 7) shaped like the three source systems: 28 trucks, 120 SKUs, 36 stores, 2 DCs, two years of daily order lines with 4% annual growth, holidays and category promotions. The production data it mirrors is proprietary."
+    source: "scripts/generate_data.py:151 (generate, seed=7), :110 (4% growth); README 'The data'"
+    figures: [F-03, F-04, F-05, F-06, F-07, F-08]
+    all_figures: true
+    edit: ["scripts/generate_data.py"]
+    rerun: ["make data", "make run"]
+  - id: A-02
+    statement: "Acceptance floor: a change is accepted only if the whole 95% interval of its total-cost change lies below -0.5% of baseline cost. The 0.5% is a judgement set from the twin's -3.3% demand bias, not a statistical result."
+    source: "src/supply_twin/harness.py:34 (MIN_COST_GAIN_SHARE = 0.005); docs/adr/0001 'Alternatives rejected'"
+    figures: [F-14, F-15, F-16, F-31, F-36, F-37, F-39, F-46, F-47, F-48]
+    edit: ["src/supply_twin/harness.py:34"]
+    rerun: ["make run", "export_search_walk.py + export_change_sheet.py + inject_sheet.py"]
+  - id: A-03
+    statement: "Fill non-inferiority: a change may lose at most 0.2 points of fill rate (lower bound of the fill-change interval)."
+    source: "src/supply_twin/harness.py:29 (FILL_NON_INFERIORITY = 0.002)"
+    figures: [F-31, F-36, F-37, F-46, F-47, F-57, F-58, F-59, F-60]
+    edit: ["src/supply_twin/harness.py:29"]
+    rerun: ["make run"]
+  - id: A-04
+    statement: "Seeds: the search uses 20 seeds (0-19) with a Bonferroni split of alpha per round; the evaluation table uses 30 seeds (1000-1029); the searched plan is confirmed on 30 hold-out seeds (5000-5029) the search never saw."
+    source: "src/supply_twin/cli.py:189-191, :207-209; agent.py:110"
+    figures: [F-09, F-12, F-32, F-40, F-41, F-42, F-43, F-44, F-51]
+    edit: ["src/supply_twin/cli.py:189-191"]
+    rerun: ["make run"]
+  - id: A-05
+    statement: "Cost constants are stated, not estimated: holding 25% a year, backroom overflow 1.0 per case-day, driver 28 per hour, trucks at 50 km/h, fleet daily fixed cost from the fleet file. Changing the overflow price changes which review period wins."
+    source: "src/supply_twin/sim.py:29-34; README 'Known limitations'"
+    figures: [F-14, F-36, F-37, F-39, F-41, F-42, F-46, F-48, F-53, F-54, F-57, F-58, F-59]
+    edit: ["src/supply_twin/sim.py:29-34"]
+    rerun: ["make run", "export_search_walk.py + export_change_sheet.py + inject_sheet.py"]
+  - id: A-06
+    statement: "Scenarios: a 91-day horizon; the promotion quarter puts beverages and snacks on a 14-day promotion from day 35; the outage scenario takes 20% of each DC's trucks out of service for the whole quarter."
+    source: "src/supply_twin/sim.py:60-64, :73-74"
+    figures: [F-09, F-26, F-35, F-59]
+    edit: ["src/supply_twin/sim.py:60-74"]
+    rerun: ["make run"]
+  - id: A-07
+    statement: "Simulated demand carries the store-SKU error spread measured in the 13-week backtest (sigma 0.104), so the simulated customers are as unpredictable as the history showed."
+    source: "src/supply_twin/fidelity.py:37 (holdout_days=91), :80-89 (rate_error_sigma); cli.py:202-204"
+    figures: [F-10, F-23, F-24, F-25, F-56]
+    edit: ["src/supply_twin/fidelity.py"]
+    rerun: ["make run"]
+  - id: A-08
+    statement: "The neighbour proposer moves one lever one grid step at a time (z, review days, cover days, fleet size, promotion awareness); the search stops when a round accepts nothing (here after 8 rounds)."
+    source: "src/supply_twin/agent.py:23-29 (GRID), :49-63 (NeighbourProposer), :105-121 (search)"
+    figures: [F-13, F-33, F-36, F-37, F-45]
+    edit: ["src/supply_twin/agent.py:23-29"]
+    rerun: ["make run"]
+  - id: A-09
+    statement: "Video rounding: money to whole units with thousands separators, percentages to 1 decimal (fill rates to 2), points to 2 decimals; '3.1M', '~2.5 min' and '≈0.1-0.2 s' are rounded labels."
+    source: "this audit (display convention)"
+    figures: [F-06, F-10, F-14, F-24, F-34, F-42, F-49, F-50, F-53, F-56]
+    edit: ["the composition file named on each slide"]
+    rerun: ["hyperframes render"]
+  - id: A-10
+    statement: "Slide 01 (industry, everyday problems) is general retail-planning knowledge used as context. It is not a result of this repo and carries no numbers."
+    source: "author's framing; README 'The problem' supports problems 1, 2 and 4"
+    figures: [F-01, F-02]
+    edit: ["compositions/s01-context.html"]
+    rerun: ["hyperframes render"]
+
+figures:
+  # ---- slide 01
+  - {id: F-01, slides: ["01"], label: "Industries that relate: grocery & convenience chains, retail DCs & store networks, regional delivery fleets", shown: "3 industry chips", type: general-knowledge, source: "author's framing", key: "-", formula: "-", manual: "Context statement, not a repo output."}
+  - {id: F-02, slides: ["01"], label: "Four everyday problems (rules tried on real stores; separate systems; promotion spikes; spreadsheet savings ignore breakdowns)", shown: "4 problem cards", type: general-knowledge, source: "README 'The problem', 'Why it is hard'", key: "README lines 9-31", formula: "-",
+     check: {expr: "grep('README.md', r'quarter of empty shelves') and grep('README.md', r'three systems that were never') and grep('README.md', r'a full fleet, no breakdowns')", fmt: bool}}
+  # ---- slide 02
+  - {id: F-03, slides: ["02", "05", "10"], label: "Distribution centres", shown: "2 DCs", type: direct, source: "data/mms_locations.csv", key: "distinct dc_id", formula: "-",
+     check: {expr: "R('data/mms_locations.csv')['dc_id'].nunique()", fmt: "{:d}", expect: "2"}}
+  - {id: F-04, slides: ["02", "05", "08", "10"], label: "Stores", shown: "36 stores", type: direct, source: "outputs/data_quality.json", key: "stores", formula: "-",
+     check: {expr: "J('outputs/data_quality.json')['stores']", fmt: "{:d}", expect: "36"}}
+  - {id: F-05, slides: ["02", "10"], label: "Dispatchable trucks after repair", shown: "26 trucks", type: direct, source: "outputs/data_quality.json", key: "trucks_dispatchable", formula: "28 in source - 2 not dispatchable",
+     check: {expr: "J('outputs/data_quality.json')['trucks_dispatchable']", fmt: "{:d}", expect: "26"}}
+  - {id: F-06, slides: ["02", "05"], label: "Order lines", shown: "3.1M order lines", type: derived, source: "outputs/data_quality.json", key: "order_lines = 3,126,764", formula: "3,126,764 / 1e6, 1 decimal",
+     check: {expr: "J('outputs/data_quality.json')['order_lines'] / 1e6", fmt: "{:.1f}M", expect: "3.1M"}}
+  - {id: F-07, slides: ["02", "05"], label: "History length", shown: "2 years", type: direct, source: "src/supply_twin/calendar.py:12", key: "HISTORY_DAYS = 731 (2024-01-01..2025-12-31)", formula: "-",
+     check: {expr: "grep('src/supply_twin/calendar.py', r'HISTORY_DAYS = 731')", fmt: bool}}
+  - {id: F-08, slides: ["02", "05"], label: "SKUs and categories", shown: "120 SKUs in 8 categories", type: direct, source: "data/mms_items.csv; outputs/data_quality.json", key: "skus; distinct category", formula: "-",
+     check: {expr: "J('outputs/data_quality.json')['skus'] == 120 and R('data/mms_items.csv')['category'].nunique() == 8", fmt: bool}}
+  - {id: F-09, slides: ["02"], label: "Quarter length and seeds per strategy", shown: "91-day quarter × 30 paired seeds", type: direct, source: "src/supply_twin/sim.py:60; outputs/strategy_table.csv", key: "horizon_days = 91; n_seeds", formula: "-",
+     check: {expr: "grep('src/supply_twin/sim.py', r'horizon_days: int = 91') and set(R('outputs/strategy_table.csv')['n_seeds']) == {30}", fmt: bool}}
+  - {id: F-10, slides: ["02", "04"], label: "Twin demand bias in the backtest", shown: "the twin itself is 3.3% low / −3.3% demand bias", type: direct, source: "outputs/fidelity.json", key: "bias.twin = -0.0327", formula: "x 100, 1 decimal",
+     check: {expr: "J('outputs/fidelity.json')['bias']['twin'] * 100", fmt: "{:.1f}%", expect: "-3.3%"}}
+  # ---- slide 03
+  - {id: F-11, slides: ["03"], label: "Flow blocks map to the code (sources, twin, propose, simulate, fair test, decision)", shown: "SOURCE DATA → DIGITAL TWIN → PROPOSE → SIMULATE → FAIR TEST → DECISION", type: direct, source: "src/supply_twin/", key: "load_sources, build_twin, NeighbourProposer.propose, simulate, Evaluator.compare, search", formula: "-",
+     check: {expr: "all(grep('src/supply_twin/' + f, p) for f, p in [('twin.py', r'def load_sources'), ('twin.py', r'def build_twin'), ('agent.py', r'class NeighbourProposer'), ('sim.py', r'def simulate'), ('harness.py', r'def compare'), ('agent.py', r'def search')])", fmt: bool}}
+  - {id: F-12, slides: ["03"], label: "Decision badges: cheaper than today; re-tested on new days (hold-out seeds); weak spots shown (robustness table)", shown: "✓ cheaper than today ✓ re-tested on new days ✓ weak spots shown", type: derived, source: "outputs/search_neighbour_promo.json; outputs/search_neighbour_promo_robustness.csv", key: "holdout.cost_diff < 0; holdout.n_seeds = 30; any robustness row not accepted", formula: "-",
+     check: {expr: "(lambda j, r: j['holdout']['cost_diff'] < 0 and j['holdout']['n_seeds'] == 30 and (~r['accepted']).any())(J('outputs/search_neighbour_promo.json'), R('outputs/search_neighbour_promo_robustness.csv'))", fmt: bool}}
+  - {id: F-13, slides: ["03"], label: "Search loop repeats until nothing wins", shown: "until nothing wins", type: direct, source: "outputs/search_neighbour_promo.csv; agent.py:118-119", key: "last round has 0 accepted candidates", formula: "-",
+     check: {expr: "(lambda d: int(d[d['round'] == d['round'].max()]['accepted'].sum()) == 0)(R('outputs/search_neighbour_promo.csv'))", fmt: bool}}
+  # ---- slide 04
+  - {id: F-14, slides: ["04"], label: "Three real candidate intervals, cost change as % of the plan in hand (mean, low, high)", shown: "Less stock cover (crosses 0) · Promotion-aware ordering (below 0, above floor) · Two fewer trucks (clears floor)", type: derived, source: "outputs/search_neighbour_promo.csv", key: "round 1 cover=0.5d: +0.139 (-0.078..+0.355); round 3 promo_aware=yes: -0.516 (-0.785..-0.247); round 2 trucks-2: -2.169 (-2.385..-1.954)", formula: "cost_diff{,_low,_high} / baseline_cost x 100, 3 decimals; must equal the IV array in compositions/explainer.html",
+     check: {expr: "intervals_match()", fmt: bool}}
+  - {id: F-15, slides: ["04"], label: "Verdicts: noise / real but inside twin error / clears the floor (the middle one is statistically significant yet rejected)", shown: "✗ could be noise · ✗ real, but inside twin error · ✓ clears the floor", type: derived, source: "outputs/search_neighbour_promo.csv", key: "accepted, p_value vs alpha", formula: "A: p >= alpha, not accepted; B: p < alpha, not accepted, fill ok; C: accepted",
+     check: {expr: "verdicts_match()", fmt: bool}}
+  - {id: F-16, slides: ["04", "05", "06"], label: "Floor = 0.5% of quarterly cost", shown: "Floor = 0.5% of quarterly cost / cost CI < −0.5% / floor −0.5%", type: direct, source: "src/supply_twin/harness.py:34", key: "MIN_COST_GAIN_SHARE = 0.005", formula: "-",
+     check: {expr: "grep('src/supply_twin/harness.py', r'^MIN_COST_GAIN_SHARE = 0.005')", fmt: bool}}
+  # ---- slide 05
+  - {id: F-17, slides: ["05"], label: "Every architecture box names a real module / function", shown: "twin.py · TwinState · fidelity.py · sim.py · simulate() · harness.py · llm.py · agent.py · cli.py · load_sources()", type: direct, source: "src/supply_twin/", key: "classes and functions", formula: "-",
+     check: {expr: "all(grep('src/supply_twin/' + f, p) for f, p in [('twin.py', r'class TwinState'), ('twin.py', r'def load_sources'), ('twin.py', r'def build_twin'), ('fidelity.py', r'def backtest'), ('sim.py', r'def simulate'), ('sim.py', r'^SCENARIOS = '), ('harness.py', r'self._cache'), ('harness.py', r'def compare'), ('llm.py', r'class LLMProposer'), ('agent.py', r'class NeighbourProposer'), ('cli.py', r'def cmd_robustness')])", fmt: bool}}
+  - {id: F-18, slides: ["05"], label: "Trucks in the fleet file (before repair)", shown: "28 trucks", type: direct, source: "outputs/data_quality.json", key: "trucks_in_source", formula: "-",
+     check: {expr: "J('outputs/data_quality.json')['trucks_in_source']", fmt: "{:d}", expect: "28"}}
+  - {id: F-19, slides: ["05", "08"], label: "Store-SKU demand rates in the twin", shown: "4,320 store-SKU rates", type: derived, source: "outputs/data_quality.json", key: "stores x skus", formula: "36 x 120 = 4,320",
+     check: {expr: "J('outputs/data_quality.json')['stores'] * J('outputs/data_quality.json')['skus']", fmt: "{:,d}", expect: "4,320"}}
+  - {id: F-20, slides: ["05"], label: "Data-quality repairs are written to a file", shown: "Data quality · data_quality.json", type: direct, source: "src/supply_twin/cli.py:49", key: "_write_json(out / 'data_quality.json')", formula: "-",
+     check: {expr: "grep('src/supply_twin/cli.py', r'data_quality.json')", fmt: bool}}
+  - {id: F-21, slides: ["05"], label: "The bus reads 4 CSV files", shown: "load_sources() · 4 CSV files", type: direct, source: "src/supply_twin/twin.py:74-80", key: "four read_csv calls", formula: "-",
+     check: {expr: "len(re.findall(r'pd.read_csv', T('src/supply_twin/twin.py'))) == 4", fmt: bool}}
+  - {id: F-22, slides: ["05"], label: "Backtest length", shown: "Backtest · 13 weeks", type: derived, source: "outputs/fidelity.json", key: "holdout_days = 91", formula: "91 / 7 = 13",
+     check: {expr: "J('outputs/fidelity.json')['holdout_days'] // 7", fmt: "{:d}", expect: "13"}}
+  - {id: F-23, slides: ["05", "08"], label: "Twin weekly store x SKU WAPE", shown: "WAPE 17.8% / 17.8%", type: direct, source: "outputs/fidelity.json", key: "wape_store_sku_week.twin", formula: "x 100",
+     check: {expr: "J('outputs/fidelity.json')['wape_store_sku_week']['twin'] * 100", fmt: "{:.1f}%", expect: "17.8%"}}
+  - {id: F-24, slides: ["05"], label: "Demand error spread injected into the simulation", shown: "σ = 0.104 demand error", type: direct, source: "outputs/fidelity.json", key: "rate_error_sigma", formula: "-",
+     check: {expr: "J('outputs/fidelity.json')['rate_error_sigma']", fmt: "{:.3f}", expect: "0.104"}}
+  - {id: F-25, slides: ["05"], label: "Backtest bias on the backtest box", shown: "bias −3.3%", type: direct, source: "outputs/fidelity.json", key: "bias.twin", formula: "x 100",
+     check: {expr: "J('outputs/fidelity.json')['bias']['twin'] * 100", fmt: "{:.1f}%", expect: "-3.3%"}}
+  - {id: F-26, slides: ["05"], label: "Simulated day: 91 days, sales at 21:00, trucks 05:00-19:00", shown: "91 days · sell 21:00 · trucks 05–19 h", type: direct, source: "src/supply_twin/sim.py:27-28, :60", key: "SHIFT_START, SHIFT_END, SALES_HOUR, horizon_days", formula: "-",
+     check: {expr: "grep('src/supply_twin/sim.py', r'SHIFT_START, SHIFT_END = 5.0, 19.0') and grep('src/supply_twin/sim.py', r'SALES_HOUR, REVIEW_HOUR = 21.0') and grep('src/supply_twin/sim.py', r'horizon_days: int = 91')", fmt: bool}}
+  - {id: F-27, slides: ["05"], label: "Run time of one simulated quarter", shown: "≈0.1–0.2 s per simulated quarter", type: direct, source: "docs/adr/0001-paired-seeds-and-a-practical-floor-decide-strategies.md:21", key: "'runs in about 0.1-0.2 s'", formula: "-",
+     check: {expr: "grep('docs/adr/0001-paired-seeds-and-a-practical-floor-decide-strategies.md', r'about 0.1-0.2 s')", fmt: bool}, note: "Stated in the ADR from the author's runs; not re-timed by this audit."}
+  - {id: F-28, slides: ["05"], label: "Simulation runs held in the run cache when the search finished", shown: "1,930 runs", type: direct, source: "outputs/search_neighbour_promo.json", key: "simulation_runs_total (Evaluator.runs: unique runs executed, including the evaluation table)", formula: "-",
+     check: {expr: "J('outputs/search_neighbour_promo.json')['simulation_runs_total']", fmt: "{:,d}", expect: "1,930"}}
+  - {id: F-29, slides: ["05"], label: "Process pool size", shown: "pool ≤ 4", type: direct, source: "src/supply_twin/harness.py:107", key: "min(4, os.cpu_count())", formula: "-",
+     check: {expr: "grep('src/supply_twin/harness.py', r'min\\(4, os.cpu_count\\(\\) or 1\\)')", fmt: bool}}
+  - {id: F-30, slides: ["05"], label: "LLM call timeout", shown: "180 s timeout", type: direct, source: "src/supply_twin/llm.py:25", key: "timeout: float = 180", formula: "-",
+     check: {expr: "grep('src/supply_twin/llm.py', r'timeout: float = 180')", fmt: bool}}
+  - {id: F-31, slides: ["05"], label: "Gate rule", shown: "accept if cost CI < −0.5% and fill loss < 0.2 pts", type: direct, source: "src/supply_twin/harness.py:29, :34, :76-86", key: "MIN_COST_GAIN_SHARE, FILL_NON_INFERIORITY", formula: "-",
+     check: {expr: "grep('src/supply_twin/harness.py', r'^FILL_NON_INFERIORITY = 0.002') and grep('src/supply_twin/harness.py', r'cost_diff\\[2\\] < -MIN_COST_GAIN_SHARE')", fmt: bool}}
+  - {id: F-32, slides: ["05"], label: "Re-test of the searched plan", shown: "30 hold-out seeds × 3 scenarios", type: direct, source: "outputs/search_neighbour_promo.json; outputs/search_neighbour_promo_robustness.csv", key: "holdout.n_seeds; robustness rows", formula: "-",
+     check: {expr: "J('outputs/search_neighbour_promo.json')['holdout']['n_seeds'] == 30 and len(R('outputs/search_neighbour_promo_robustness.csv')) == 3", fmt: bool}}
+  - {id: F-33, slides: ["05"], label: "Gate counter at the end of the loop", shown: "round 8 · 71 tested (counts up through rounds 1-8)", type: direct, source: "outputs/search_neighbour_promo.csv / .json", key: "rounds, candidates_tested, cumulative per round", formula: "cumulative tested per round = 8, 17, 26, 35, 44, 53, 62, 71",
+     check: {expr: "list(R('outputs/search_neighbour_promo.csv').groupby('round').size().cumsum()) == [8, 17, 26, 35, 44, 53, 62, 71] and grep('demo:compositions/s03-architecture.html', r'\\[\\[8, 1\\], \\[17, 2\\], \\[26, 3\\], \\[35, 4\\], \\[44, 5\\], \\[53, 6\\], \\[62, 7\\], \\[71, 8\\]\\]')", fmt: bool}}
+  - {id: F-34, slides: ["05", "10"], label: "End-to-end run time", shown: "make run ≈ 2.5 min / ~2.5 min", type: derived, source: "outputs/run_log.txt", key: "'2:26.26 total'", formula: "146.26 s / 60 = 2.44 min, rounded to the nearest half minute",
+     check: {expr: "(lambda m: round((int(m.group(1)) * 60 + float(m.group(2))) / 60 * 2) / 2)(re.search(r'(\\d+):(\\d+\\.\\d+) total', T('outputs/run_log.txt')))", fmt: "{:.1f} min", expect: "2.5 min"}}
+  - {id: F-35, slides: ["05"], label: "Three scenarios", shown: "3 scenarios · base · promo · outage", type: direct, source: "src/supply_twin/sim.py:71-75", key: "SCENARIOS keys base, promo, fleet_outage", formula: "-",
+     check: {expr: "set(R('outputs/strategy_table.csv')['scenario']) == {'base', 'promo', 'fleet_outage'}", fmt: bool}}
+  # ---- slide 06
+  - {id: F-36, slides: ["06"], label: "Every dot = one tested candidate (round, cost change vs the plan in hand, accepted, chosen); 6 off the chart above +320k", shown: "71 candidates over 8 rounds; ▲ = 6 far costlier ones", type: direct, source: "outputs/search_neighbour_promo.csv → demo assets/search_walk.json, injected into compositions/s04-running.html", key: "round, cost_diff, accepted, chosen", formula: "dot y = cost_diff / 1000 (k); off-chart if > 320k",
+     check: {expr: "walk_matches() and int((R('outputs/search_neighbour_promo.csv')['cost_diff'] > 320000).sum()) == 6", fmt: bool}}
+  - {id: F-37, slides: ["06"], label: "Steps taken (side list)", shown: "1 review 2d −143,755 · 2 trucks −2 −50,217 · 3 trucks −4 −56,085 · 4 trucks −6 −44,795 · 5 trucks −8 −46,004 · 6 promo-aware −20,339 · 7 z 0.84 −49,375 · 8 nothing passes", type: direct, source: "outputs/search_neighbour_promo.csv", key: "rows with chosen = True", formula: "rounded to whole units",
+     check: {expr: "[round(v) for v in R('outputs/search_neighbour_promo.csv').query('chosen')['cost_diff']] == [-143755, -50217, -56085, -44795, -46004, -20339, -49375]", fmt: bool}}
+  - {id: F-38, slides: ["06"], label: "Plan in hand at the start", shown: "2,458,533 (start of the counter)", type: direct, source: "outputs/search_neighbour_promo.csv", key: "round 1 baseline_cost", formula: "-",
+     check: {expr: "R('outputs/search_neighbour_promo.csv').query('round == 1')['baseline_cost'].iloc[0]", fmt: "{:,.0f}", expect: "2,458,533"}}
+  - {id: F-39, slides: ["06"], label: "Plan in hand after the search (20 search seeds)", shown: "2,047,964", type: direct, source: "outputs/search_neighbour_promo.csv", key: "round 8 baseline_cost", formula: "-",
+     check: {expr: "R('outputs/search_neighbour_promo.csv').query('round == 8')['baseline_cost'].iloc[0]", fmt: "{:,.0f}", expect: "2,047,964"}}
+  - {id: F-40, slides: ["06"], label: "Seeds per test in the search", shown: "20 paired seeds per test", type: direct, source: "outputs/search_neighbour_promo.json", key: "search_seeds", formula: "-",
+     check: {expr: "J('outputs/search_neighbour_promo.json')['search_seeds']", fmt: "{:d}", expect: "20"}}
+  - {id: F-41, slides: ["06", "08"], label: "Hold-out: current policy cost and searched plan cost (30 new seeds, promotion quarter)", shown: "2,458,347 → 2,051,146", type: derived, source: "outputs/search_neighbour_promo.json", key: "holdout.baseline_cost, holdout.cost_diff", formula: "2,458,346.6 - 407,200.4 = 2,051,146.1",
+     check: {expr: "(lambda h: '{:,.0f} -> {:,.0f}'.format(h['baseline_cost'], h['baseline_cost'] + h['cost_diff']))(J('outputs/search_neighbour_promo.json')['holdout'])", fmt: "{}", expect: "2,458,347 -> 2,051,146"}}
+  - {id: F-42, slides: ["06", "08"], label: "Hold-out cost change", shown: "−16.6%", type: derived, source: "outputs/search_neighbour_promo.json", key: "holdout.cost_diff / holdout.baseline_cost", formula: "-407,200.4 / 2,458,346.6 x 100 = -16.56%",
+     check: {expr: "(lambda h: h['cost_diff'] / h['baseline_cost'] * 100)(J('outputs/search_neighbour_promo.json')['holdout'])", fmt: "{:.1f}%", expect: "-16.6%"}}
+  - {id: F-43, slides: ["06"], label: "Hold-out fill change", shown: "fill −0.13 pts", type: direct, source: "outputs/search_neighbour_promo.json", key: "holdout.fill_diff_pts", formula: "-",
+     check: {expr: "J('outputs/search_neighbour_promo.json')['holdout']['fill_diff_pts']", fmt: "{:.2f}", expect: "-0.13"}}
+  - {id: F-44, slides: ["06"], label: "Hold-out truck utilisation change", shown: "truck use +12.9 pts", type: direct, source: "outputs/search_neighbour_promo.json", key: "holdout.util_diff_pts", formula: "-",
+     check: {expr: "J('outputs/search_neighbour_promo.json')['holdout']['util_diff_pts']", fmt: "{:+.1f}", expect: "+12.9"}}
+  - {id: F-45, slides: ["06"], label: "Searched plan", shown: "searched plan: z=0.84 review=2d cover=1d trucks-8 promo_aware=yes", type: direct, source: "outputs/search_neighbour_promo.json", key: "final", formula: "-",
+     check: {expr: "J('outputs/search_neighbour_promo.json')['final']", fmt: "{}", expect: "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes"}}
+  # ---- slide 07
+  - {id: F-46, slides: ["07"], label: "Scorecard rows: cost, change vs today ±95%, fill, promo fill, verdict for the 7 named strategies (promotion quarter, 30 seeds)", shown: "Current policy 2,460,080 … High service 2,616,577 (+156,497 ±2,984)", type: direct, source: "demo assets/change_sheet.json (re-run of the repo's evaluation, seeds 1000-1029), injected into compositions/value.html; equals outputs/strategy_table.csv scenario=promo", key: "total_cost, cost_vs_current, cost_vs_current_ci_half, fill_rate, promo_fill_rate, beats_current", formula: "-",
+     check: {expr: "sheet_matches()", fmt: bool}}
+  - {id: F-47, slides: ["07"], label: "Changes that clear the gate", shown: "3 of 6 changes clear the gate", type: direct, source: "outputs/strategy_table.csv", key: "scenario=promo, beats_current", formula: "-",
+     check: {expr: "int(R('outputs/strategy_table.csv').query(\"scenario == 'promo'\")['beats_current'].sum())", fmt: "{:d} of 6", expect: "3 of 6"}}
+  - {id: F-48, slides: ["07"], label: "Best change and its saving", shown: "best: order every 2 days, −142,008 a quarter", type: direct, source: "outputs/strategy_table.csv", key: "scenario=promo, strategy='order every 2 days', cost_vs_current", formula: "-",
+     check: {expr: "row('outputs/strategy_table.csv', scenario='promo', strategy='order every 2 days')['cost_vs_current']", fmt: "{:,.0f}", expect: "-142,008"}}
+  - {id: F-49, slides: ["07"], label: "Truck load fill, current vs every 2 days", shown: "65% → 78%", type: direct, source: "outputs/strategy_table.csv", key: "scenario=promo, load_fill (0.6461, 0.7760)", formula: "x 100, whole percent",
+     check: {expr: "'{:.0f}% -> {:.0f}%'.format(row('outputs/strategy_table.csv', scenario='promo', strategy='current policy')['load_fill'] * 100, row('outputs/strategy_table.csv', scenario='promo', strategy='order every 2 days')['load_fill'] * 100)", fmt: "{}", expect: "65% -> 78%"}}
+  - {id: F-50, slides: ["07"], label: "Promo fill, current vs every 2 days (the trade-off)", shown: "98.4% → 96.8%", type: direct, source: "outputs/strategy_table.csv", key: "scenario=promo, promo_fill_rate (0.9844, 0.9679)", formula: "x 100, 1 decimal",
+     check: {expr: "'{:.1f}% -> {:.1f}%'.format(row('outputs/strategy_table.csv', scenario='promo', strategy='current policy')['promo_fill_rate'] * 100, row('outputs/strategy_table.csv', scenario='promo', strategy='order every 2 days')['promo_fill_rate'] * 100)", fmt: "{}", expect: "98.4% -> 96.8%"}}
+  - {id: F-51, slides: ["07"], label: "Seeds on the scorecard", shown: "PROMO QUARTER · 30 SEEDS / 30 seeds", type: direct, source: "demo assets/change_sheet.json", key: "n_seeds", formula: "-",
+     check: {expr: "J('demo:assets/change_sheet.json')['n_seeds']", fmt: "{:d}", expect: "30"}}
+  - {id: F-52, slides: ["07"], label: "Network scene: 36 stores, each at its real distance from its own DC; which stores order on each day follows the code's review stagger", shown: "DCs → 36 stores, deliveries on alternating days", type: direct, source: "data/mms_locations.csv; src/supply_twin/sim.py:291 ((day + s) % review_days)", key: "store_id, dc_id, distance_km", formula: "radius = 26 px + km x 0.68 px; angle illustrative",
+     check: {expr: "stores_match() and grep('src/supply_twin/sim.py', r'\\(day \\+ s\\) % strategy.review_days')", fmt: bool}}
+  # ---- slide 08
+  - {id: F-53, slides: ["08"], label: "Cost change, ordering every 2 days (promotion quarter)", shown: "−5.8%", type: derived, source: "outputs/strategy_table.csv", key: "scenario=promo, total_cost: 2,318,072 vs 2,460,080", formula: "(2,318,072 / 2,460,080 - 1) x 100 = -5.77%",
+     check: {expr: "(row('outputs/strategy_table.csv', scenario='promo', strategy='order every 2 days')['total_cost'] / row('outputs/strategy_table.csv', scenario='promo', strategy='current policy')['total_cost'] - 1) * 100", fmt: "{:.1f}%", expect: "-5.8%"}}
+  - {id: F-54, slides: ["08"], label: "Total cost, current vs every 2 days", shown: "2,460,080 → 2,318,072", type: direct, source: "outputs/strategy_table.csv", key: "scenario=promo, total_cost", formula: "-",
+     check: {expr: "'{:,.0f} -> {:,.0f}'.format(row('outputs/strategy_table.csv', scenario='promo', strategy='current policy')['total_cost'], row('outputs/strategy_table.csv', scenario='promo', strategy='order every 2 days')['total_cost'])", fmt: "{}", expect: "2,460,080 -> 2,318,072"}}
+  - {id: F-55, slides: ["08"], label: "Naive references' WAPE (8-week mean, same day last year)", shown: "naive: 24.5% · 29.1%", type: direct, source: "outputs/fidelity.json", key: "wape_store_sku_week.recent_8wk_mean, same_day_last_year", formula: "x 100",
+     check: {expr: "(lambda w: '{:.1f}% / {:.1f}%'.format(w['recent_8wk_mean'] * 100, w['same_day_last_year'] * 100))(J('outputs/fidelity.json')['wape_store_sku_week'])", fmt: "{}", expect: "24.5% / 29.1%"}}
+  - {id: F-56, slides: ["08"], label: "Promo fill rate with promotion-aware ordering vs current", shown: "99.95% · current policy 98.44%", type: direct, source: "outputs/strategy_table.csv", key: "scenario=promo, promo_fill_rate", formula: "x 100, 2 decimals",
+     check: {expr: "'{:.2f}% / {:.2f}%'.format(row('outputs/strategy_table.csv', scenario='promo', strategy='promo-aware ordering')['promo_fill_rate'] * 100, row('outputs/strategy_table.csv', scenario='promo', strategy='current policy')['promo_fill_rate'] * 100)", fmt: "{}", expect: "99.95% / 98.44%"}}
+  # ---- slide 09
+  - {id: F-57, slides: ["09"], label: "Promotion quarter (tuned on): fill change, cost change, verdict", shown: "−0.13 · −407,200 cost · holds", type: direct, source: "outputs/search_neighbour_promo_robustness.csv", key: "scenario=promo", formula: "-",
+     check: {expr: "(lambda r: '{:.2f} {:,.0f} {}'.format(r['fill_diff_pts'], r['cost_diff'], r['accepted']))(row('outputs/search_neighbour_promo_robustness.csv', scenario='promo'))", fmt: "{}", expect: "-0.13 -407,200 True"}}
+  - {id: F-58, slides: ["09"], label: "Normal quarter: fill change, cost change, verdict", shown: "−0.21 · −398,970 cost · fails", type: direct, source: "outputs/search_neighbour_promo_robustness.csv", key: "scenario=base", formula: "-",
+     check: {expr: "(lambda r: '{:.2f} {:,.0f} {}'.format(r['fill_diff_pts'], r['cost_diff'], r['accepted']))(row('outputs/search_neighbour_promo_robustness.csv', scenario='base'))", fmt: "{}", expect: "-0.21 -398,970 False"}}
+  - {id: F-59, slides: ["09"], label: "20% of fleet down: fill change, cost change, late loads, verdict", shown: "−1.88 · +63,322 cost · 1,336 late loads · fails", type: direct, source: "outputs/search_neighbour_promo_robustness.csv", key: "scenario=fleet_outage", formula: "late loads = final_late_loads (mean over 30 seeds) rounded",
+     check: {expr: "(lambda r: '{:.2f} {:+,.0f} {:,.0f} {}'.format(r['fill_diff_pts'], r['cost_diff'], r['final_late_loads'], r['accepted']))(row('outputs/search_neighbour_promo_robustness.csv', scenario='fleet_outage'))", fmt: "{}", expect: "-1.88 +63,322 1,336 False"}}
+  - {id: F-60, slides: ["09"], label: "Fill-loss limit line", shown: "0.2-pt limit", type: direct, source: "src/supply_twin/harness.py:29", key: "FILL_NON_INFERIORITY = 0.002", formula: "-",
+     check: {expr: "grep('src/supply_twin/harness.py', r'^FILL_NON_INFERIORITY = 0.002')", fmt: bool}}
+  - {id: F-61, slides: ["09"], label: "Ordering every 2 days alone beats the current policy in all three scenarios", shown: "Ordering every 2 days alone is the robust win.", type: derived, source: "outputs/strategy_table.csv", key: "strategy='order every 2 days', beats_current per scenario", formula: "-",
+     check: {expr: "bool(R('outputs/strategy_table.csv').query(\"strategy == 'order every 2 days'\")['beats_current'].all())", fmt: bool}}
+  # ---- slide 10
+  - {id: F-62, slides: ["10"], label: "Licence", shown: "MIT", type: direct, source: "LICENSE line 1", key: "-", formula: "-",
+     check: {expr: "T('LICENSE').startswith('MIT License')", fmt: bool}}
+  - {id: F-63, slides: ["10"], label: "Stack chips are real dependencies", shown: "SimPy · pandas · SciPy · Python", type: direct, source: "pyproject.toml dependencies", key: "simpy, pandas, scipy", formula: "-",
+     check: {expr: "all(grep('pyproject.toml', p) for p in [r'\"simpy', r'\"pandas', r'\"scipy', r'requires-python'])", fmt: bool}}
+  - {id: F-64, slides: ["10"], label: "Run command", shown: "$ make run", type: direct, source: "Makefile", key: "run target", formula: "-",
+     check: {expr: "grep('Makefile', r'^run:')", fmt: bool}}
+
+slides:
+  - id: "01"
+    title: "The industry"
+    image: slides/slide-01.jpg
+    time: "0.0-7.2 s"
+    composition: "compositions/s01-context.html"
+    text:
+      - "01 · THE INDUSTRY"
+      - "Every planning change is a bet on next quarter's shelves."
+      - "WHO LIVES WITH THIS · Grocery & convenience chains · Retail DCs & store networks · Regional delivery fleets"
+      - "01 New ordering rules are tried on real stores — A bad idea shows up as a quarter of empty shelves"
+      - "02 Fleet, items and sales live in separate systems — Nobody sees the whole network at once"
+      - "03 Promotions spike demand for two weeks — Stores run short mid-promotion, then overstock"
+      - "04 Savings on a spreadsheet assume nothing breaks — Trucks in the workshop undo a lean plan"
+      - "THIS PROJECT tests every change on a digital twin first · join → simulate → compare → accept"
+    assumptions: [A-10]
+    illustrative: ["The whole slide is context; no repo figures."]
+    change: "Edit the chips (#ctx-c1..3) and cards (#ctx-k1..4) in compositions/s01-context.html."
+  - id: "02"
+    title: "This project"
+    image: slides/slide-02.jpg
+    time: "6.8-11.6 s"
+    composition: "compositions/s02-hook.html"
+    text:
+      - "02 · THIS PROJECT"
+      - "2 DCs, 36 stores, 26 trucks. 3.1M order lines, 2 years. Which change actually pays?"
+      - "120 SKUs in 8 categories · 91-day quarter × 30 paired seeds · the twin itself is 3.3% low"
+    assumptions: [A-01, A-04, A-06, A-07]
+    illustrative: ["Rings in the background are decoration."]
+    change: "Headline spans #hook-l1..l3 and chips #hook-f1..f3 in compositions/s02-hook.html; counts come from outputs/data_quality.json."
+  - id: "03"
+    title: "How it works (white chapter, slide A)"
+    image: slides/slide-03.jpg
+    time: "11.3-19.3 s"
+    composition: "compositions/explainer.html (CONFIG.blocks, CONFIG.groups, CONFIG.loop)"
+    text:
+      - "03 · HOW IT WORKS"
+      - "Test the change first"
+      - "[BUILT ONCE: SOURCE DATA fleet, items, orders → DIGITAL TWIN learns demand from history] → [SEARCH LOOP: PROPOSE one change at a time → SIMULATE a quarter, many times → FAIR TEST same customers, both plans] → DECISION ✓ cheaper than today ✓ re-tested on new days ✓ weak spots shown"
+      - "until nothing wins (loop over SIMULATE)"
+    assumptions: [A-04, A-08]
+    illustrative: ["Icons and colours are a visual language, not data.", "'new days' means new random seeds, i.e. new simulated customers."]
+    change: "Edit CONFIG in compositions/explainer.html; badge truth comes from the search JSON and robustness CSV (F-12)."
+  - id: "04"
+    title: "The key idea (white chapter, slide B)"
+    image: slides/slide-04.jpg
+    time: "19.3-27.3 s"
+    composition: "compositions/explainer.html (#ex-b ..., IV array)"
+    text:
+      - "04 · THE KEY IDEA"
+      - "Trust only real wins"
+      - "Both plans meet the same customers — so the only difference is the plan"
+      - "Measure how wrong the twin is — on past weeks it never saw"
+      - "Accept only gains that clear a floor — a tiny \"significant\" gain still fails"
+      - "THREE CHANGES · COST VS TODAY: Less stock cover ✗ could be noise · Promotion-aware ordering ✗ real, but inside twin error · Two fewer trucks ✓ clears the floor · ← CHEAPER · FLOOR · 0 · COSTLIER →"
+      - "Floor = 0.5% of quarterly cost: a judgement set from the twin's −3.3% demand bias in the backtest."
+    assumptions: [A-02, A-03, A-07]
+    illustrative: ["The three intervals are real candidates from the search log (F-14), drawn to scale on a -2.6%..+0.6% axis; 'today' in the pill means the plan in hand at that round, not always the original policy."]
+    change: "Markup under #ex-b and the IV array in compositions/explainer.html; F-14 checks the IV values against the CSV."
+  - id: "05"
+    title: "Architecture"
+    image: slides/slide-05.jpg
+    time: "27.0-43.0 s"
+    composition: "compositions/s03-architecture.html (BANDS, NODES, WIRES, LABELS)"
+    text:
+      - "05 · ARCHITECTURE"
+      - "Proposers only propose. A paired-seed gate decides."
+      - "SOURCES (synthetic, seeded): FMS 28 trucks fms_fleet.csv · MMS 120 SKUs · 8 categories mms_items.csv · MMS 36 stores · 2 DCs mms_locations.csv · OMS 3.1M lines · 2 years oms_order_lines.csv.gz → load_sources() · 4 CSV files"
+      - "TWIN BUILD (batch, per run): twin.py Join + repair build_twin() · pandas → writes Data quality data_quality.json; → rates TwinState Demand model 4,320 store-SKU rates; fidelity.py Backtest · 13 weeks WAPE 17.8% · bias −3.3%"
+      - "SIMULATION (SimPy, in-process): sim.py 3 scenarios base · promo · outage → Scenario → sim.py · simulate() SimPy quarter 91 days · sell 21:00 · trucks 05–19 h ≈0.1–0.2 s per simulated quarter → metrics → harness.py Run cache 1,930 runs · pool ≤ 4; rates · fleet · distances; σ = 0.104 demand error"
+      - "DECISION (paired-seed gate): llm.py Ollama LLM optional, local 180 s timeout → JSON → agent.py Strategy agent neighbour proposer, one lever per step → Strategy → harness.py Acceptance gate ◆ decision point accept if cost CI < −0.5% and fill loss < 0.2 pts → verdict; (strategy, scenario, seed) jobs; cost · fill · util / seed; bad reply → neighbours; round 8 · 71 tested → plan → cli.py Re-test 30 hold-out seeds × 3 scenarios"
+      - "OUTPUT (files + a person): writes CSV → outputs/ CSV + JSON tables → reads → Planner rolls it out, or not"
+      - "Legend: in-process call · file read / write (batch) · HTTP, optional · fallback path · CRITICAL PATH · MAKE RUN ≈ 2.5 MIN"
+    assumptions: [A-01, A-02, A-03, A-04, A-07, A-08]
+    illustrative: ["Packets moving along the edges show execution order, not timing; the search loop is shown as 3 laps for the 8 real rounds while the counter steps through the real cumulative counts.", "The Planner box is the human decision the README describes ('a yes or no they can roll out'); the repo has no UI for it.", "'Run cache' is the Evaluator's in-memory cache keyed by (strategy, scenario, seed) in harness.py; drawn as a store because it holds results."]
+    change: "Edit NODES / WIRES / LABELS in compositions/s03-architecture.html; F-17 checks every named module/function exists."
+  - id: "06"
+    title: "The system running"
+    image: slides/slide-06a.jpg
+    image2: slides/slide-06b.jpg
+    time: "42.6-57.6 s"
+    composition: "compositions/s04-running.html (WALK block injected by tools/inject_sheet.py from assets/search_walk.json)"
+    text:
+      - "06 · THE SYSTEM RUNNING"
+      - "The agent's search, round by round."
+      - "promotion quarter · 20 paired seeds per test · ● rejected ○ passed gate ● step taken ▬ floor −0.5%"
+      - "Chart: cost change vs the plan in hand (−150k..+300k) by round 1..8"
+      - "PLAN IN HAND · COST / QTR 2,458,533 → 2,047,964 · 1 review 2d −143,755 · 2 trucks −2 −50,217 · 3 trucks −4 −56,085 · 4 trucks −6 −44,795 · 5 trucks −8 −46,004 · 6 promo-aware −20,339 · 7 z 0.84 −49,375 · 8 nothing passes stop"
+      - "Each dot: one candidate tested against the plan in hand (71 in all). ▲ = 6 far costlier ones, off the chart."
+      - "HOLD-OUT · 30 NEW SEEDS · PROMOTION QUARTER · searched plan: z=0.84 review=2d cover=1d trucks-8 promo_aware=yes · 2,458,347 → 2,051,146 · −16.6% · fill −0.13 pts · truck use +12.9 pts · tuned on this quarter only"
+    assumptions: [A-02, A-03, A-04, A-05, A-08]
+    illustrative: ["Dots within a round are spread sideways only so they do not overlap; their height is the real cost change.", "The amber strips under zero are the gate's floor for that round (0.5% of the plan in hand)."]
+    change: "Re-run tools/export_search_walk.py and tools/inject_sheet.py (--name WALK); layout in compositions/s04-running.html."
+  - id: "07"
+    title: "End-user value (white)"
+    image: slides/slide-07.jpg
+    time: "57.3-71.3 s"
+    composition: "compositions/value.html (SHEET block injected by tools/inject_sheet.py from assets/change_sheet.json)"
+    text:
+      - "07 · END-USER VALUE"
+      - "What the planner gets"
+      - "CHANGE SCORECARD · PROMO QUARTER · 30 SEEDS — CHANGE, COST / QTR, VS TODAY ±95%, FILL, PROMO, VERDICT"
+      - "Current policy 2,460,080 — 99.85% 98.44% TODAY"
+      - "Order every 2 days 2,318,072 −142,008 ±3,375 99.77% 96.79% ✓ GO"
+      - "Fleet −4 trucks 2,382,877 −77,204 ±3,070 99.76% 98.39% ✓ GO"
+      - "Promo-aware ordering 2,440,652 −19,428 ±2,485 99.93% 99.95% ✓ GO"
+      - "Fleet +4 trucks 2,547,522 +87,442 ±2,691 99.87% 98.45% ✗ NO"
+      - "Lean stock 2,588,004 +127,924 ±5,004 99.22% 93.72% ✗ NO"
+      - "High service 2,616,577 +156,497 ±2,984 99.96% 99.51% ✗ NO"
+      - "✓ 3 of 6 changes clear the gate · best: order every 2 days, −142,008 a quarter"
+      - "PLANNER · PICKS A CHANGE: Order every 2 days · ✓ GO −142,008 / quarter, 30 seeds"
+      - "DCS → 36 STORES · NEXT QUARTER · DAY 1..4 · truck load fill 65% → 78% · promo fill (the trade-off) 98.4% → 96.8%"
+      - "Each change arrives priced and checked before any store tries it. No quarter spent finding out."
+    assumptions: [A-02, A-03, A-04, A-05, A-06]
+    illustrative: ["Planner figure is a placeholder (no real person).", "Store angles around each DC are evenly spaced (the data has no coordinates); each store's distance from its DC is real.", "Purple trips and green dots replay the review stagger of 'order every 2 days' (which half of the stores orders each day); they are not simulated truck movements.", "'No quarter spent finding out' is framing from the README problem statement, not a measured result."]
+    change: "Re-run tools/export_change_sheet.py, then tools/inject_sheet.py (--name SHEET); CONFIG.pick chooses the row the planner hands over."
+  - id: "08"
+    title: "Results"
+    image: slides/slide-08.jpg
+    time: "71.0-79.8 s"
+    composition: "compositions/s05-results.html (stats array)"
+    text:
+      - "08 · RESULTS · 30 PAIRED SEEDS PER STRATEGY"
+      - "Real savings found, by a twin that beats naive forecasts."
+      - "SINGLE CHANGE −5.8% cost, ordering every 2 days · 2,460,080 → 2,318,072"
+      - "AGENT SEARCH −16.6% cost, searched plan, hold-out · 2,458,347 → 2,051,146"
+      - "TWIN FIDELITY 17.8% weekly store×SKU WAPE · naive: 24.5% · 29.1%"
+      - "PROMO-AWARE 99.95% promo fill rate · current policy 98.44%"
+      - "Promotion quarter · 91 days · 36 stores · 4,320 store-SKUs · numbers from outputs/"
+    assumptions: [A-04, A-05, A-07, A-09]
+    illustrative: ["Mini bars under each number are drawn to the ratio after / before (card 3: twin / 8-week mean)."]
+    change: "The stats array and card text in compositions/s05-results.html."
+  - id: "09"
+    title: "What didn't win"
+    image: slides/slide-09.jpg
+    time: "79.4-86.6 s"
+    composition: "compositions/s06-twist.html"
+    text:
+      - "09 · WHAT DIDN'T WIN"
+      - "The searched plan breaks when trucks break down."
+      - "Searched plan re-tested on 30 new seeds per scenario · change in fill rate (points)"
+      - "Promotion quarter (tuned on · −407,200 cost) −0.13 holds · Normal quarter (−398,970 cost) −0.21 fails · 20% of fleet down (+63,322 cost · 1,336 late loads) −1.88 fails · 0.2-pt limit"
+      - "Why: the search cut trucks until the base case was just covered, so nothing is left for breakdowns. Ordering every 2 days alone is the robust win."
+    assumptions: [A-03, A-04, A-06]
+    illustrative: ["Bar lengths: 1,000 px track = 2.0 points of fill loss; the dashed line is the 0.2-point limit."]
+    change: "Rows #twist-r1..r3 (bar widths are inline styles) in compositions/s06-twist.html."
+  - id: "10"
+    title: "End card"
+    image: slides/slide-10.jpg
+    time: "86.2-90.6 s"
+    composition: "compositions/s07-end.html"
+    text:
+      - "10 · OPEN SOURCE · MIT · RUNS ON A LAPTOP"
+      - "supply-chain-twin"
+      - "github.com/kavya2693/supply-chain-twin"
+      - "SimPy · pandas · SciPy · Python"
+      - "$ make run   # 36 stores, 2 DCs, 26 trucks, ~2.5 min"
+    assumptions: [A-09]
+    illustrative: ["The faded network on the right is decoration drawn from geometry, not data."]
+    change: "Text in compositions/s07-end.html."
+
+caveats:
+  - "The whole dataset is synthetic and the twin is estimated from data produced by the same family of assumptions it then simulates, so fidelity (17.8% WAPE) is an upper bound on what a real extract would give (README 'The data')."
+  - "−16.6% (slides 06, 08) is the searched plan on the quarter it was tuned on; it fails the fill limit on a normal quarter and fails on cost and fill with 20% of the fleet down (slide 09)."
+  - "'1,930 runs' is the number of unique simulations executed when the search finished, including the evaluation table; the robustness re-test ran more afterwards."
+  - "'≈0.1–0.2 s per simulated quarter' is quoted from ADR-0001, not re-timed by this audit."
+  - "'make run ≈ 2.5 min' is the author's run_log (2:26); the README says about 3 minutes on 4 cores."
+  - "Slide 04's three intervals compare each candidate with the plan in hand at that round of the search, not always with the original policy."
+  - "The language-model proposer is drawn in the architecture but was only tested with stubbed replies (README 'Known limitations'); every number in the video comes from the neighbour proposer."
+  - "Slide 01 statements are general retail-planning knowledge (A-10)."
+
+stills:
+  master: renders/supply-chain-twin-master.mp4   # relative to demo_dir
+  width: 1600
+  times: {"01": 6.4, "02": 11.1, "03": 18.9, "04": 26.4, "05": 41.8, "06a": 50.0, "06b": 57.0, "07": 70.4, "08": 79.0, "09": 86.0, "10": 90.4}
+
+# Extra check helpers (Python), available to check expressions.
+helpers: |
+  import re as _re
+  def _block(path, name):
+      html = T(path)
+      m = _re.search(r"const " + name + r" = (\{.*?\}); /\* " + name + r":END", html, _re.S)
+      return json.loads(m.group(1))
+  def walk_matches():
+      """The WALK block in s04-running.html must equal the search log row by row."""
+      w = _block('demo:compositions/s04-running.html', 'WALK')
+      d = R('outputs/search_neighbour_promo.csv')
+      if len(w['candidates']) != len(d) or w['candidates_tested'] != len(d):
+          return False
+      for c, (_, r) in zip(w['candidates'], d.iterrows()):
+          if c['round'] != r['round'] or abs(c['diff'] - r['cost_diff']) > 0.01:
+              return False
+          if c['accepted'] != bool(r['accepted']) or c['chosen'] != bool(r['chosen']):
+              return False
+      h = J('outputs/search_neighbour_promo.json')['holdout']
+      return abs(w['holdout']['cost_diff'] - h['cost_diff']) < 0.01 and w['holdout']['n_seeds'] == h['n_seeds']
+  def _iv(rnd, cand):
+      d = R('outputs/search_neighbour_promo.csv')
+      r = d[(d['round'] == rnd) & (d['candidate'] == cand)].iloc[0]
+      return r, [float(round(r[k] / r['baseline_cost'] * 100, 3)) for k in ('cost_diff_low', 'cost_diff', 'cost_diff_high')]
+  _IV = [(1, 'z=1.28 review=1d cover=0.5d trucks+0 promo_aware=no'),
+         (3, 'z=1.28 review=2d cover=1d trucks-2 promo_aware=yes'),
+         (2, 'z=1.28 review=2d cover=1d trucks-2 promo_aware=no')]
+  def intervals_match():
+      """The IV array in explainer.html must equal the three candidates' intervals (% of the plan in hand)."""
+      html = T('demo:compositions/explainer.html')
+      for rnd, cand in _IV:
+          _, (lo, m, hi) = _iv(rnd, cand)
+          if not _re.search(r"lo: %s, m: %s, hi: %s" % (repr(lo), repr(m), repr(hi)), html):
+              return False
+      return True
+  def verdicts_match():
+      a, _ = _iv(*_IV[0]); b, _ = _iv(*_IV[1]); c, _ = _iv(*_IV[2])
+      return (not a['accepted'] and a['p_value'] >= a['alpha'] and a['cost_diff_low'] < 0 < a['cost_diff_high']
+              and not b['accepted'] and b['p_value'] < b['alpha'] and b['cost_diff_high'] < 0 and b['fill_diff_low_pts'] > -0.2
+              and bool(c['accepted']))
+  def sheet_matches():
+      """The SHEET block in value.html must equal outputs/strategy_table.csv for the promotion quarter."""
+      s = _block('demo:compositions/value.html', 'SHEET')
+      t = R('outputs/strategy_table.csv')
+      t = t[t['scenario'] == 'promo'].set_index('strategy')
+      if len(s['rows']) != len(t):
+          return False
+      for r in s['rows']:
+          x = t.loc[r['strategy']]
+          for a, b in [('total_cost', 'total_cost'), ('cost_vs_current', 'cost_vs_current'), ('cost_vs_current_ci_half', 'cost_vs_current_ci_half'),
+                       ('fill_rate', 'fill_rate'), ('promo_fill_rate', 'promo_fill_rate'), ('load_fill', 'load_fill')]:
+              if abs(r[a] - x[b]) > 1e-6 * max(1.0, abs(x[b])):
+                  return False
+          if r['beats_current'] != bool(x['beats_current']):
+              return False
+      return s['n_seeds'] == 30
+  def stores_match():
+      s = _block('demo:compositions/value.html', 'SHEET')['stores']
+      loc = R('data/mms_locations.csv')
+      return len(s) == len(loc) == 36 and all(
+          a['store'] == b['store_id'] and a['dc'] == b['dc_id'] and abs(a['km'] - b['distance_km']) < 1e-9 and a['index'] == i
+          for i, (a, (_, b)) in enumerate(zip(s, loc.iterrows())))

@@ -1,0 +1,784 @@
+{
+ "search_seeds": 20,
+ "rounds": 8,
+ "candidates_tested": 71,
+ "start": "z=1.28 review=1d cover=1d trucks+0 promo_aware=no",
+ "final": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+ "holdout": {
+  "n_seeds": 30,
+  "baseline_cost": 2458346.588196777,
+  "cost_diff": -407200.4400791078,
+  "fill_diff_pts": -0.133,
+  "util_diff_pts": 12.93
+ },
+ "steps": [
+  {
+   "round": 1,
+   "incumbent_cost": 2458533.1502865357,
+   "chosen": "review=2d",
+   "tested": 8,
+   "accepted": 3
+  },
+  {
+   "round": 2,
+   "incumbent_cost": 2314778.4636040353,
+   "chosen": "trucks-2",
+   "tested": 9,
+   "accepted": 3
+  },
+  {
+   "round": 3,
+   "incumbent_cost": 2264561.5871558166,
+   "chosen": "trucks-4",
+   "tested": 9,
+   "accepted": 3
+  },
+  {
+   "round": 4,
+   "incumbent_cost": 2208477.028950247,
+   "chosen": "trucks-6",
+   "tested": 9,
+   "accepted": 3
+  },
+  {
+   "round": 5,
+   "incumbent_cost": 2163682.048066463,
+   "chosen": "trucks-8",
+   "tested": 9,
+   "accepted": 4
+  },
+  {
+   "round": 6,
+   "incumbent_cost": 2117678.0498579247,
+   "chosen": "promo_aware=yes",
+   "tested": 9,
+   "accepted": 1
+  },
+  {
+   "round": 7,
+   "incumbent_cost": 2097338.5897410093,
+   "chosen": "z=0.84",
+   "tested": 9,
+   "accepted": 2
+  },
+  {
+   "round": 8,
+   "incumbent_cost": 2047963.924355513,
+   "chosen": null,
+   "tested": 9,
+   "accepted": 0
+  }
+ ],
+ "candidates": [
+  {
+   "round": 1,
+   "lever": "z=0.84",
+   "diff": 6439.982367768464,
+   "low": 1214.990700744931,
+   "high": 11664.974034791998,
+   "base": 2458533.1502865357,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 1,
+   "lever": "z=1.65",
+   "diff": 9871.661058166015,
+   "low": 3440.6445097023616,
+   "high": 16302.677606629672,
+   "base": 2458533.1502865357,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 1,
+   "lever": "review=2d",
+   "diff": -143754.6866825,
+   "low": -149438.7252253601,
+   "high": -138070.6481396399,
+   "base": 2458533.1502865357,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 1,
+   "lever": "cover=0.5d",
+   "diff": 3410.6777635665844,
+   "low": -1913.3473666147945,
+   "high": 8734.702893747963,
+   "base": 2458533.1502865357,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 1,
+   "lever": "cover=2d",
+   "diff": 43593.047644637525,
+   "low": 36855.0700886292,
+   "high": 50331.02520064585,
+   "base": 2458533.1502865357,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 1,
+   "lever": "trucks-2",
+   "diff": -47195.44245642496,
+   "low": -51952.47581589778,
+   "high": -42438.409096952135,
+   "base": 2458533.1502865357,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 1,
+   "lever": "trucks+2",
+   "diff": 41335.11989990629,
+   "low": 37288.8215482858,
+   "high": 45381.41825152678,
+   "base": 2458533.1502865357,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 1,
+   "lever": "promo_aware=yes",
+   "diff": -19145.449130857876,
+   "low": -22996.7522760268,
+   "high": -15294.145985688952,
+   "base": 2458533.1502865357,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "z=0.84",
+   "diff": -42750.41060718657,
+   "low": -48220.18889429668,
+   "high": -37280.63232007645,
+   "base": 2314778.4636040353,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "z=1.65",
+   "diff": 97434.6894974838,
+   "low": 92437.04531220732,
+   "high": 102432.3336827603,
+   "base": 2314778.4636040353,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "review=1d",
+   "diff": 143754.6866825,
+   "low": 137972.92943444356,
+   "high": 149536.44393055644,
+   "base": 2314778.4636040353,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "review=3d",
+   "diff": 294038.48469352326,
+   "low": 286623.8949787682,
+   "high": 301453.07440827833,
+   "base": 2314778.4636040353,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "cover=0.5d",
+   "diff": -36575.49861739583,
+   "low": -43215.47874269301,
+   "high": -29935.518492098647,
+   "base": 2314778.4636040353,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "cover=2d",
+   "diff": 210089.552217606,
+   "low": 204888.57030635592,
+   "high": 215290.5341288561,
+   "base": 2314778.4636040353,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "trucks-2",
+   "diff": -50216.87644821857,
+   "low": -55200.70648670276,
+   "high": -45233.04640973439,
+   "base": 2314778.4636040353,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 2,
+   "lever": "trucks+2",
+   "diff": 47899.71695381096,
+   "low": 44284.19144507298,
+   "high": 51515.24246254894,
+   "base": 2314778.4636040353,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 2,
+   "lever": "promo_aware=yes",
+   "diff": -13964.650087033422,
+   "low": -18785.41441240144,
+   "high": -9143.885761665402,
+   "base": 2314778.4636040353,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "z=0.84",
+   "diff": -38847.739838507914,
+   "low": -42516.31083925961,
+   "high": -35179.16883775622,
+   "base": 2264561.5871558166,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "z=1.65",
+   "diff": 94429.96148291018,
+   "low": 90557.98288253092,
+   "high": 98301.94008328945,
+   "base": 2264561.5871558166,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "review=1d",
+   "diff": 146776.12067429363,
+   "low": 140788.8401795534,
+   "high": 152763.40116903387,
+   "base": 2264561.5871558166,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "review=3d",
+   "diff": 301168.3533329092,
+   "low": 294346.5883171629,
+   "high": 307990.11834865547,
+   "base": 2264561.5871558166,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "cover=0.5d",
+   "diff": -37138.31348012968,
+   "low": -41295.16612253549,
+   "high": -32981.46083772387,
+   "base": 2264561.5871558166,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "cover=2d",
+   "diff": 207503.0882005505,
+   "low": 202289.5549738686,
+   "high": 212716.6214272324,
+   "base": 2264561.5871558166,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "trucks-4",
+   "diff": -56084.55820556939,
+   "low": -60926.846994717205,
+   "high": -51242.269416421586,
+   "base": 2264561.5871558166,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 3,
+   "lever": "trucks+0",
+   "diff": 50216.87644821857,
+   "low": 45233.04640973439,
+   "high": 55200.70648670276,
+   "base": 2264561.5871558166,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 3,
+   "lever": "promo_aware=yes",
+   "diff": -11684.363393585896,
+   "low": -17768.404367468953,
+   "high": -5600.322419702838,
+   "base": 2264561.5871558166,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "z=0.84",
+   "diff": -35373.0180921081,
+   "low": -41522.68566552414,
+   "high": -29223.350518692052,
+   "base": 2208477.028950247,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "z=1.65",
+   "diff": 90606.96514891084,
+   "low": 85632.3847093595,
+   "high": 95581.54558846218,
+   "base": 2208477.028950247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "review=1d",
+   "diff": 174153.59669007553,
+   "low": 166361.2838056218,
+   "high": 181945.90957452927,
+   "base": 2208477.028950247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "review=3d",
+   "diff": 308419.0841652181,
+   "low": 301775.5269983231,
+   "high": 315062.6413321131,
+   "base": 2208477.028950247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "cover=0.5d",
+   "diff": -34589.45833740816,
+   "low": -40297.485302156194,
+   "high": -28881.431372660132,
+   "base": 2208477.028950247,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "cover=2d",
+   "diff": 201388.58000768197,
+   "low": 194886.30126991932,
+   "high": 207890.85874544465,
+   "base": 2208477.028950247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "trucks-6",
+   "diff": -44794.980883785014,
+   "low": -49092.72295354224,
+   "high": -40497.23881402779,
+   "base": 2208477.028950247,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 4,
+   "lever": "trucks-2",
+   "diff": 56084.55820556939,
+   "low": 51242.269416421586,
+   "high": 60926.846994717205,
+   "base": 2208477.028950247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 4,
+   "lever": "promo_aware=yes",
+   "diff": -16167.751650666632,
+   "low": -22105.67859717272,
+   "high": -10229.82470416054,
+   "base": 2208477.028950247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "z=0.84",
+   "diff": -23077.823486630175,
+   "low": -28691.623321548697,
+   "high": -17464.023651711657,
+   "base": 2163682.048066463,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "z=1.65",
+   "diff": 83940.77056828018,
+   "low": 77642.84021088798,
+   "high": 90238.70092567235,
+   "base": 2163682.048066463,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "review=1d",
+   "diff": 248857.4851802149,
+   "low": 237485.6692947481,
+   "high": 260229.30106568168,
+   "base": 2163682.048066463,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "review=3d",
+   "diff": 298139.81774697016,
+   "low": 290198.39692110877,
+   "high": 306081.23857283156,
+   "base": 2163682.048066463,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "cover=0.5d",
+   "diff": -21365.405032939743,
+   "low": -27604.07470710236,
+   "high": -15126.735358777129,
+   "base": 2163682.048066463,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "cover=2d",
+   "diff": 187100.4124854636,
+   "low": 180236.1737339497,
+   "high": 193964.65123697752,
+   "base": 2163682.048066463,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "trucks-8",
+   "diff": -46003.9982085384,
+   "low": -51505.87549322307,
+   "high": -40502.12092385372,
+   "base": 2163682.048066463,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 5,
+   "lever": "trucks-4",
+   "diff": 44794.980883785014,
+   "low": 40497.23881402779,
+   "high": 49092.72295354224,
+   "base": 2163682.048066463,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 5,
+   "lever": "promo_aware=yes",
+   "diff": -16185.049775578966,
+   "low": -20579.943942551643,
+   "high": -11790.155608606288,
+   "base": 2163682.048066463,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "z=0.84",
+   "diff": -11307.025799635623,
+   "low": -18070.573159202795,
+   "high": -4543.478440068449,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "z=1.65",
+   "diff": 72589.48811695896,
+   "low": 66865.97948876063,
+   "high": 78312.9967451573,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "review=1d",
+   "diff": 968914.995030923,
+   "low": 891477.7314329825,
+   "high": 1046352.2586288636,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "review=3d",
+   "diff": 275897.97027729906,
+   "low": 268908.75083976606,
+   "high": 282887.18971483206,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "cover=0.5d",
+   "diff": -11770.03214671443,
+   "low": -17772.413808564575,
+   "high": -5767.650484864285,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "cover=2d",
+   "diff": 164341.9144645888,
+   "low": 157236.8584770751,
+   "high": 171446.9704521025,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "trucks-10",
+   "diff": 602972.1461340728,
+   "low": 545664.4561382872,
+   "high": 660279.8361298584,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "trucks-6",
+   "diff": 46003.9982085384,
+   "low": 40502.12092385372,
+   "high": 51505.87549322307,
+   "base": 2117678.0498579247,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 6,
+   "lever": "promo_aware=yes",
+   "diff": -20339.460116915812,
+   "low": -26663.008801095635,
+   "high": -14015.91143273599,
+   "base": 2117678.0498579247,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 7,
+   "lever": "z=0.84",
+   "diff": -49374.665385495966,
+   "low": -54851.97008848634,
+   "high": -43897.36068250559,
+   "base": 2097338.5897410093,
+   "accepted": true,
+   "chosen": true
+  },
+  {
+   "round": 7,
+   "lever": "z=1.65",
+   "diff": 101099.82451098577,
+   "low": 94272.19269651326,
+   "high": 107927.45632545828,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "review=1d",
+   "diff": 968814.0757985092,
+   "low": 925005.6894972496,
+   "high": 1012622.462099769,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "review=3d",
+   "diff": 292052.9959479944,
+   "low": 284168.55033767555,
+   "high": 299937.44155831326,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "cover=0.5d",
+   "diff": -47503.38729046863,
+   "low": -54981.67283962339,
+   "high": -40025.10174131386,
+   "base": 2097338.5897410093,
+   "accepted": true,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "cover=2d",
+   "diff": 214097.24453439465,
+   "low": 206947.28635477097,
+   "high": 221247.20271401823,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "trucks-10",
+   "diff": 592079.3617749742,
+   "low": 554109.3483408778,
+   "high": 630049.3752090705,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "trucks-6",
+   "diff": 50158.40854987524,
+   "low": 43846.7632093929,
+   "high": 56470.05389035758,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 7,
+   "lever": "promo_aware=no",
+   "diff": 20339.460116915812,
+   "low": 14015.91143273599,
+   "high": 26663.008801095635,
+   "base": 2097338.5897410093,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "z=0.5",
+   "diff": 8187.78578794183,
+   "low": 1314.2786095650226,
+   "high": 15061.292966318637,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "z=1.28",
+   "diff": 49374.665385495966,
+   "low": 43897.36068250559,
+   "high": 54851.97008848634,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "review=1d",
+   "diff": 1166151.3724824938,
+   "low": 1093215.4868123557,
+   "high": 1239087.258152632,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "review=3d",
+   "diff": 113541.54949448963,
+   "low": 107551.32579264088,
+   "high": 119531.77319633838,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "cover=0.5d",
+   "diff": 13340.3107161168,
+   "low": 8308.166872452352,
+   "high": 18372.45455978125,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "cover=2d",
+   "diff": 109800.6111907342,
+   "low": 103349.36034920898,
+   "high": 116251.86203225942,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "trucks-10",
+   "diff": 717008.6285950493,
+   "low": 663286.61145582,
+   "high": 770730.6457342785,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "trucks-6",
+   "diff": 38840.021101085025,
+   "low": 33494.22773948283,
+   "high": 44185.81446268722,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  },
+  {
+   "round": 8,
+   "lever": "promo_aware=no",
+   "diff": 58407.099702776155,
+   "low": 51853.19476221857,
+   "high": 64961.00464333374,
+   "base": 2047963.924355513,
+   "accepted": false,
+   "chosen": false
+  }
+ ]
+}

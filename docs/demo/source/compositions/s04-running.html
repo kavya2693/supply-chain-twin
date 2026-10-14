@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #running-root { position: absolute; inset: 0; }
+        #running-root .legend {
+          position: absolute; right: 120px; top: 126px; font-family: var(--mono); font-size: 22px;
+          line-height: 1.55; color: var(--ink-soft); text-align: right;
+        }
+        #running-root .legend b { color: var(--c-opt); font-weight: 700; }
+        #running-root .legend i { font-style: normal; color: var(--ink-mute); }
+        #running-root .chart {
+          position: absolute; left: 120px; top: 228px; width: 1250px; height: 620px; border-radius: 14px;
+          border: 2px solid var(--line); background: rgba(11, 23, 34, 0.92);
+        }
+        #running-root svg.plot { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #running-root .note { position: absolute; left: 120px; top: 872px; width: 1250px; font-size: 24px; color: var(--ink-mute); }
+        #running-root .side { position: absolute; left: 1420px; top: 228px; width: 380px; height: 620px; }
+        #running-root .side .lab { font-family: var(--mono); font-size: 20px; letter-spacing: 0.1em; color: var(--ink-mute); }
+        #running-root .side .big {
+          margin-top: 8px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 58px; font-weight: 700;
+          letter-spacing: -0.03em; color: var(--ink);
+        }
+        #running-root .side .rows { margin-top: 22px; border-top: 2px solid var(--line); padding-top: 12px; }
+        #running-root .side .rw {
+          display: flex; justify-content: space-between; height: 44px; align-items: center; font-family: var(--mono);
+          font-variant-numeric: tabular-nums; font-size: 23px; color: var(--ink-soft); white-space: nowrap;
+        }
+        #running-root .side .rw b { color: var(--c-opt); font-weight: 700; }
+        #running-root .side .rw.stop { color: var(--c-risk); }
+        #running-root .hold {
+          position: absolute; left: 260px; top: 260px; width: 1400px; height: 560px; border-radius: 20px;
+          border: 2px solid rgba(63, 216, 168, 0.6); background: rgba(12, 22, 32, 0.97);
+          box-shadow: 0 30px 120px rgba(0, 0, 0, 0.6); padding: 50px 72px;
+        }
+        #running-root .h-label { font-family: var(--mono); font-size: 26px; letter-spacing: 0.1em; color: var(--c-opt); }
+        #running-root .h-plan { margin-top: 12px; font-family: var(--mono); font-size: 24px; color: var(--ink-soft); }
+        #running-root .h-row { display: flex; align-items: center; gap: 28px; margin-top: 18px; }
+        #running-root .h-num {
+          font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 140px; font-weight: 700;
+          letter-spacing: -0.04em; color: var(--ink); width: 820px;
+        }
+        #running-root .h-badge {
+          font-family: var(--mono); font-size: 60px; font-weight: 700; color: #ffffff;
+          background: var(--c-opt-deep); padding: 6px 22px; border-radius: 12px;
+        }
+        #running-root .bar-row { display: flex; align-items: center; gap: 22px; margin-top: 14px; }
+        #running-root .bar-row .who { width: 230px; font-family: var(--mono); font-size: 24px; color: var(--ink-soft); }
+        #running-root .bar-track { position: relative; width: 1000px; height: 24px; border-radius: 12px; background: rgba(178, 191, 204, 0.1); }
+        #running-root .bar-fill { position: absolute; left: 0; top: 0; width: 1000px; height: 24px; border-radius: 12px; transform-origin: left center; }
+        #running-root .chips { display: flex; gap: 18px; margin-top: 30px; }
+        #running-root .chip { display: block; font-family: var(--mono); font-size: 24px; padding: 8px 18px; border-radius: 8px; border: 2px solid var(--line); color: var(--ink); }
+        #running-root .chip.risk { border-color: rgba(255, 138, 115, 0.6); color: var(--c-risk); }
+      </style>
+
+      <div id="running-root" data-composition-id="running" data-width="1920" data-height="1080">
+        <div class="scene" id="running-in">
+          <div class="eyebrow" data-layout-allow-overlap id="running-eyebrow">06 · The system running</div>
+          <div class="scene-title" data-layout-allow-overlap id="running-title">The agent's search, round by round.</div>
+          <div class="legend" id="running-legend">
+            <div>promotion quarter · <b>20 paired seeds</b> per test</div>
+            <div><i>●</i> rejected &nbsp; <b>○</b> passed gate &nbsp; <b>●</b> step taken &nbsp; <span style="color: var(--c-eval)">▬ floor −0.5%</span></div>
+          </div>
+          <div id="running-a" data-layout-allow-occlusion>
+            <div class="chart" id="running-chart"></div>
+            <svg class="plot" id="running-svg" viewBox="0 0 1920 1080"></svg>
+            <div class="note" id="running-note"></div>
+            <div class="side" id="running-side">
+              <div class="lab">PLAN IN HAND · COST / QTR</div>
+              <div class="big" id="running-big">2,458,533</div>
+              <div class="rows" id="running-rows"></div>
+            </div>
+          </div>
+          <div class="hold" id="running-hold">
+            <div class="h-label" id="running-h-label"></div>
+            <div class="h-plan" id="running-h-plan"></div>
+            <div class="h-row">
+              <div class="h-num" id="running-h-num">0</div>
+              <div class="h-badge" id="running-h-badge"></div>
+            </div>
+            <div class="bar-row"><div class="who">current policy</div><div class="bar-track"><div class="bar-fill" style="background: var(--ink-mute)"></div></div></div>
+            <div class="bar-row"><div class="who" style="color: var(--c-opt)">searched plan</div><div class="bar-track"><div class="bar-fill" id="running-h-bar" style="background: var(--c-opt)"></div></div></div>
+            <div class="chips">
+              <span class="chip" id="running-c1"></span>
+              <span class="chip" id="running-c2"></span>
+              <span class="chip risk" id="running-c3">tuned on this quarter only</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          /* WALK:BEGIN */ const WALK = {"search_seeds":20,"rounds":8,"candidates_tested":71,"start":"z=1.28 review=1d cover=1d trucks+0 promo_aware=no","final":"z=0.84 review=2d cover=1d trucks-8 promo_aware=yes","holdout":{"n_seeds":30,"baseline_cost":2458346.588196777,"cost_diff":-407200.4400791078,"fill_diff_pts":-0.133,"util_diff_pts":12.93},"steps":[{"round":1,"incumbent_cost":2458533.1502865357,"chosen":"review=2d","tested":8,"accepted":3},{"round":2,"incumbent_cost":2314778.4636040353,"chosen":"trucks-2","tested":9,"accepted":3},{"round":3,"incumbent_cost":2264561.5871558166,"chosen":"trucks-4","tested":9,"accepted":3},{"round":4,"incumbent_cost":2208477.028950247,"chosen":"trucks-6","tested":9,"accepted":3},{"round":5,"incumbent_cost":2163682.048066463,"chosen":"trucks-8","tested":9,"accepted":4},{"round":6,"incumbent_cost":2117678.0498579247,"chosen":"promo_aware=yes","tested":9,"accepted":1},{"round":7,"incumbent_cost":2097338.5897410093,"chosen":"z=0.84","tested":9,"accepted":2},{"round":8,"incumbent_cost":2047963.924355513,"chosen":null,"tested":9,"accepted":0}],"candidates":[{"round":1,"lever":"z=0.84","diff":6439.982367768464,"low":1214.990700744931,"high":11664.974034791998,"base":2458533.1502865357,"accepted":false,"chosen":false},{"round":1,"lever":"z=1.65","diff":9871.661058166015,"low":3440.6445097023616,"high":16302.677606629672,"base":2458533.1502865357,"accepted":false,"chosen":false},{"round":1,"lever":"review=2d","diff":-143754.6866825,"low":-149438.7252253601,"high":-138070.6481396399,"base":2458533.1502865357,"accepted":true,"chosen":true},{"round":1,"lever":"cover=0.5d","diff":3410.6777635665844,"low":-1913.3473666147945,"high":8734.702893747963,"base":2458533.1502865357,"accepted":false,"chosen":false},{"round":1,"lever":"cover=2d","diff":43593.047644637525,"low":36855.0700886292,"high":50331.02520064585,"base":2458533.1502865357,"accepted":false,"chosen":false},{"round":1,"lever":"trucks-2","diff":-47195.44245642496,"low":-51952.47581589778,"high":-42438.409096952135,"base":2458533.1502865357,"accepted":true,"chosen":false},{"round":1,"lever":"trucks+2","diff":41335.11989990629,"low":37288.8215482858,"high":45381.41825152678,"base":2458533.1502865357,"accepted":false,"chosen":false},{"round":1,"lever":"promo_aware=yes","diff":-19145.449130857876,"low":-22996.7522760268,"high":-15294.145985688952,"base":2458533.1502865357,"accepted":true,"chosen":false},{"round":2,"lever":"z=0.84","diff":-42750.41060718657,"low":-48220.18889429668,"high":-37280.63232007645,"base":2314778.4636040353,"accepted":true,"chosen":false},{"round":2,"lever":"z=1.65","diff":97434.6894974838,"low":92437.04531220732,"high":102432.3336827603,"base":2314778.4636040353,"accepted":false,"chosen":false},{"round":2,"lever":"review=1d","diff":143754.6866825,"low":137972.92943444356,"high":149536.44393055644,"base":2314778.4636040353,"accepted":false,"chosen":false},{"round":2,"lever":"review=3d","diff":294038.48469352326,"low":286623.8949787682,"high":301453.07440827833,"base":2314778.4636040353,"accepted":false,"chosen":false},{"round":2,"lever":"cover=0.5d","diff":-36575.49861739583,"low":-43215.47874269301,"high":-29935.518492098647,"base":2314778.4636040353,"accepted":true,"chosen":false},{"round":2,"lever":"cover=2d","diff":210089.552217606,"low":204888.57030635592,"high":215290.5341288561,"base":2314778.4636040353,"accepted":false,"chosen":false},{"round":2,"lever":"trucks-2","diff":-50216.87644821857,"low":-55200.70648670276,"high":-45233.04640973439,"base":2314778.4636040353,"accepted":true,"chosen":true},{"round":2,"lever":"trucks+2","diff":47899.71695381096,"low":44284.19144507298,"high":51515.24246254894,"base":2314778.4636040353,"accepted":false,"chosen":false},{"round":2,"lever":"promo_aware=yes","diff":-13964.650087033422,"low":-18785.41441240144,"high":-9143.885761665402,"base":2314778.4636040353,"accepted":false,"chosen":false},{"round":3,"lever":"z=0.84","diff":-38847.739838507914,"low":-42516.31083925961,"high":-35179.16883775622,"base":2264561.5871558166,"accepted":true,"chosen":false},{"round":3,"lever":"z=1.65","diff":94429.96148291018,"low":90557.98288253092,"high":98301.94008328945,"base":2264561.5871558166,"accepted":false,"chosen":false},{"round":3,"lever":"review=1d","diff":146776.12067429363,"low":140788.8401795534,"high":152763.40116903387,"base":2264561.5871558166,"accepted":false,"chosen":false},{"round":3,"lever":"review=3d","diff":301168.3533329092,"low":294346.5883171629,"high":307990.11834865547,"base":2264561.5871558166,"accepted":false,"chosen":false},{"round":3,"lever":"cover=0.5d","diff":-37138.31348012968,"low":-41295.16612253549,"high":-32981.46083772387,"base":2264561.5871558166,"accepted":true,"chosen":false},{"round":3,"lever":"cover=2d","diff":207503.0882005505,"low":202289.5549738686,"high":212716.6214272324,"base":2264561.5871558166,"accepted":false,"chosen":false},{"round":3,"lever":"trucks-4","diff":-56084.55820556939,"low":-60926.846994717205,"high":-51242.269416421586,"base":2264561.5871558166,"accepted":true,"chosen":true},{"round":3,"lever":"trucks+0","diff":50216.87644821857,"low":45233.04640973439,"high":55200.70648670276,"base":2264561.5871558166,"accepted":false,"chosen":false},{"round":3,"lever":"promo_aware=yes","diff":-11684.363393585896,"low":-17768.404367468953,"high":-5600.322419702838,"base":2264561.5871558166,"accepted":false,"chosen":false},{"round":4,"lever":"z=0.84","diff":-35373.0180921081,"low":-41522.68566552414,"high":-29223.350518692052,"base":2208477.028950247,"accepted":true,"chosen":false},{"round":4,"lever":"z=1.65","diff":90606.96514891084,"low":85632.3847093595,"high":95581.54558846218,"base":2208477.028950247,"accepted":false,"chosen":false},{"round":4,"lever":"review=1d","diff":174153.59669007553,"low":166361.2838056218,"high":181945.90957452927,"base":2208477.028950247,"accepted":false,"chosen":false},{"round":4,"lever":"review=3d","diff":308419.0841652181,"low":301775.5269983231,"high":315062.6413321131,"base":2208477.028950247,"accepted":false,"chosen":false},{"round":4,"lever":"cover=0.5d","diff":-34589.45833740816,"low":-40297.485302156194,"high":-28881.431372660132,"base":2208477.028950247,"accepted":true,"chosen":false},{"round":4,"lever":"cover=2d","diff":201388.58000768197,"low":194886.30126991932,"high":207890.85874544465,"base":2208477.028950247,"accepted":false,"chosen":false},{"round":4,"lever":"trucks-6","diff":-44794.980883785014,"low":-49092.72295354224,"high":-40497.23881402779,"base":2208477.028950247,"accepted":true,"chosen":true},{"round":4,"lever":"trucks-2","diff":56084.55820556939,"low":51242.269416421586,"high":60926.846994717205,"base":2208477.028950247,"accepted":false,"chosen":false},{"round":4,"lever":"promo_aware=yes","diff":-16167.751650666632,"low":-22105.67859717272,"high":-10229.82470416054,"base":2208477.028950247,"accepted":false,"chosen":false},{"round":5,"lever":"z=0.84","diff":-23077.823486630175,"low":-28691.623321548697,"high":-17464.023651711657,"base":2163682.048066463,"accepted":true,"chosen":false},{"round":5,"lever":"z=1.65","diff":83940.77056828018,"low":77642.84021088798,"high":90238.70092567235,"base":2163682.048066463,"accepted":false,"chosen":false},{"round":5,"lever":"review=1d","diff":248857.4851802149,"low":237485.6692947481,"high":260229.30106568168,"base":2163682.048066463,"accepted":false,"chosen":false},{"round":5,"lever":"review=3d","diff":298139.81774697016,"low":290198.39692110877,"high":306081.23857283156,"base":2163682.048066463,"accepted":false,"chosen":false},{"round":5,"lever":"cover=0.5d","diff":-21365.405032939743,"low":-27604.07470710236,"high":-15126.735358777129,"base":2163682.048066463,"accepted":true,"chosen":false},{"round":5,"lever":"cover=2d","diff":187100.4124854636,"low":180236.1737339497,"high":193964.65123697752,"base":2163682.048066463,"accepted":false,"chosen":false},{"round":5,"lever":"trucks-8","diff":-46003.9982085384,"low":-51505.87549322307,"high":-40502.12092385372,"base":2163682.048066463,"accepted":true,"chosen":true},{"round":5,"lever":"trucks-4","diff":44794.980883785014,"low":40497.23881402779,"high":49092.72295354224,"base":2163682.048066463,"accepted":false,"chosen":false},{"round":5,"lever":"promo_aware=yes","diff":-16185.049775578966,"low":-20579.943942551643,"high":-11790.155608606288,"base":2163682.048066463,"accepted":true,"chosen":false},{"round":6,"lever":"z=0.84","diff":-11307.025799635623,"low":-18070.573159202795,"high":-4543.478440068449,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"z=1.65","diff":72589.48811695896,"low":66865.97948876063,"high":78312.9967451573,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"review=1d","diff":968914.995030923,"low":891477.7314329825,"high":1046352.2586288636,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"review=3d","diff":275897.97027729906,"low":268908.75083976606,"high":282887.18971483206,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"cover=0.5d","diff":-11770.03214671443,"low":-17772.413808564575,"high":-5767.650484864285,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"cover=2d","diff":164341.9144645888,"low":157236.8584770751,"high":171446.9704521025,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"trucks-10","diff":602972.1461340728,"low":545664.4561382872,"high":660279.8361298584,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"trucks-6","diff":46003.9982085384,"low":40502.12092385372,"high":51505.87549322307,"base":2117678.0498579247,"accepted":false,"chosen":false},{"round":6,"lever":"promo_aware=yes","diff":-20339.460116915812,"low":-26663.008801095635,"high":-14015.91143273599,"base":2117678.0498579247,"accepted":true,"chosen":true},{"round":7,"lever":"z=0.84","diff":-49374.665385495966,"low":-54851.97008848634,"high":-43897.36068250559,"base":2097338.5897410093,"accepted":true,"chosen":true},{"round":7,"lever":"z=1.65","diff":101099.82451098577,"low":94272.19269651326,"high":107927.45632545828,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":7,"lever":"review=1d","diff":968814.0757985092,"low":925005.6894972496,"high":1012622.462099769,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":7,"lever":"review=3d","diff":292052.9959479944,"low":284168.55033767555,"high":299937.44155831326,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":7,"lever":"cover=0.5d","diff":-47503.38729046863,"low":-54981.67283962339,"high":-40025.10174131386,"base":2097338.5897410093,"accepted":true,"chosen":false},{"round":7,"lever":"cover=2d","diff":214097.24453439465,"low":206947.28635477097,"high":221247.20271401823,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":7,"lever":"trucks-10","diff":592079.3617749742,"low":554109.3483408778,"high":630049.3752090705,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":7,"lever":"trucks-6","diff":50158.40854987524,"low":43846.7632093929,"high":56470.05389035758,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":7,"lever":"promo_aware=no","diff":20339.460116915812,"low":14015.91143273599,"high":26663.008801095635,"base":2097338.5897410093,"accepted":false,"chosen":false},{"round":8,"lever":"z=0.5","diff":8187.78578794183,"low":1314.2786095650226,"high":15061.292966318637,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"z=1.28","diff":49374.665385495966,"low":43897.36068250559,"high":54851.97008848634,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"review=1d","diff":1166151.3724824938,"low":1093215.4868123557,"high":1239087.258152632,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"review=3d","diff":113541.54949448963,"low":107551.32579264088,"high":119531.77319633838,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"cover=0.5d","diff":13340.3107161168,"low":8308.166872452352,"high":18372.45455978125,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"cover=2d","diff":109800.6111907342,"low":103349.36034920898,"high":116251.86203225942,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"trucks-10","diff":717008.6285950493,"low":663286.61145582,"high":770730.6457342785,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"trucks-6","diff":38840.021101085025,"low":33494.22773948283,"high":44185.81446268722,"base":2047963.924355513,"accepted":false,"chosen":false},{"round":8,"lever":"promo_aware=no","diff":58407.099702776155,"low":51853.19476221857,"high":64961.00464333374,"base":2047963.924355513,"accepted":false,"chosen":false}]}; /* WALK:END */
+          const tl = gsap.timeline({ paused: true });
+          const D = 15;
+          const NS = "http://www.w3.org/2000/svg";
+          const svg = document.getElementById("running-svg");
+          const mk = (tag, a, parent) => { const e = document.createElementNS(NS, tag); Object.entries(a).forEach(([k, v]) => e.setAttribute(k, v)); (parent || svg).appendChild(e); return e; };
+          const fmt = (v) => Math.round(v).toLocaleString("en-US");
+          const sgn = (v) => (v < 0 ? "−" : "+") + fmt(Math.abs(v));
+          const nice = (lv) => lv === null ? "nothing passes" : lv.replace("review=", "review ").replace("trucks-", "trucks −").replace("trucks+", "trucks +")
+            .replace("promo_aware=yes", "promo-aware").replace("promo_aware=no", "promo off").replace("z=", "z ").replace("cover=", "cover ");
+
+          // plot geometry: x = round, y = cost change vs the plan in hand (thousands)
+          const PX = { l: 250, r: 1340, t: 268, b: 748 }, YMIN = -160, YMAX = 320;
+          const nR = WALK.rounds, colW = (PX.r - PX.l) / nR;
+          const X = (r) => PX.l + (r - 0.5) * colW;
+          const Y = (k) => PX.t + ((YMAX - k) / (YMAX - YMIN)) * (PX.b - PX.t);
+          [-150, -100, -50, 0, 100, 200, 300].forEach((k) => {
+            mk("line", { x1: PX.l, x2: PX.r, y1: Y(k), y2: Y(k), stroke: k === 0 ? "#8494a6" : "rgba(178,191,204,0.12)", "stroke-width": k === 0 ? 2.5 : 1.5, class: "running-grid" });
+            const t = mk("text", { x: PX.l - 14, y: Y(k) + 7, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6", class: "running-grid" });
+            t.textContent = k === 0 ? "0" : (k > 0 ? "+" : "−") + Math.abs(k) + "k";
+          });
+          // the gate's floor (0.5% of the plan in hand) per round
+          WALK.steps.forEach((s) => {
+            const f = (-0.005 * s.incumbent_cost) / 1000;
+            mk("rect", { x: X(s.round) - colW / 2 + 6, y: Y(0), width: colW - 12, height: Y(f) - Y(0), fill: "rgba(242,196,109,0.22)", class: "running-grid" });
+          });
+          WALK.steps.forEach((s) => {
+            const t = mk("text", { x: X(s.round), y: PX.b + 36, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6", class: "running-grid" });
+            t.textContent = "round " + s.round;
+          });
+          // candidate dots
+          const byRound = {};
+          WALK.candidates.forEach((c) => (byRound[c.round] = byRound[c.round] || []).push(c));
+          let off = 0;
+          const dots = {};
+          Object.entries(byRound).forEach(([r, cs]) => {
+            dots[r] = cs.map((c, k) => {
+              const x = X(+r) + (k - (cs.length - 1) / 2) * 11;
+              const v = c.diff / 1000;
+              let el;
+              if (v > YMAX) {
+                off += 1;
+                el = mk("path", { d: "M" + (x - 7) + " " + (PX.t + 8) + "h14l-7 -12z", fill: "#8494a6", opacity: 0 });
+              } else if (c.chosen) {
+                el = mk("circle", { cx: x, cy: Y(v), r: 12, fill: "#3fd8a8", stroke: "#0a1119", "stroke-width": 3, opacity: 0 });
+              } else if (c.accepted) {
+                el = mk("circle", { cx: x, cy: Y(v), r: 8, fill: "#0b1722", stroke: "#3fd8a8", "stroke-width": 3, opacity: 0 });
+              } else {
+                el = mk("circle", { cx: x, cy: Y(v), r: 7, fill: "rgba(178,191,204,0.5)", opacity: 0 });
+              }
+              return { el, c };
+            });
+          });
+          document.getElementById("running-note").textContent =
+            "Each dot: one candidate tested against the plan in hand (" + WALK.candidates_tested + " in all). ▲ = " + off + " far costlier ones, off the chart.";
+          // side list
+          const rowsEl = document.getElementById("running-rows");
+          WALK.steps.forEach((s, i) => {
+            const ch = WALK.candidates.find((c) => c.round === s.round && c.chosen);
+            rowsEl.insertAdjacentHTML("beforeend", '<div class="rw' + (ch ? "" : " stop") + '" id="running-rw' + i + '"><span>' + s.round + " · " + nice(s.chosen) + "</span>" +
+              (ch ? "<b>" + sgn(ch.diff) + "</b>" : "<span>stop</span>") + "</div>");
+          });
+          const H = WALK.holdout, after = H.baseline_cost + H.cost_diff;
+          document.getElementById("running-h-label").textContent = "HOLD-OUT · " + H.n_seeds + " NEW SEEDS · PROMOTION QUARTER";
+          document.getElementById("running-h-plan").textContent = "searched plan: " + WALK.final;
+          document.getElementById("running-h-badge").textContent = "−" + (Math.abs(H.cost_diff / H.baseline_cost) * 100).toFixed(1) + "%";
+          document.getElementById("running-c1").textContent = "fill " + (H.fill_diff_pts < 0 ? "−" : "+") + Math.abs(H.fill_diff_pts).toFixed(2) + " pts";
+          document.getElementById("running-c2").textContent = "truck use +" + H.util_diff_pts.toFixed(1) + " pts";
+
+          // ---------------- choreography ----------------
+          tl.fromTo("#running-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#running-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#running-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#running-legend", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.6);
+          tl.fromTo("#running-chart", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.5);
+          tl.fromTo(".running-grid", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.8);
+          tl.fromTo("#running-side", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.8);
+          tl.fromTo("#running-note", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.2);
+          const big = document.getElementById("running-big");
+          const cost = { v: WALK.steps[0].incumbent_cost };
+          let last = cost.v;
+          WALK.steps.forEach((s, i) => {
+            const at = 1.3 + i * 0.72;
+            dots[s.round].forEach((d, k) => tl.fromTo(d.el, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.2 }, at + k * 0.035));
+            const chosen = dots[s.round].find((d) => d.c.chosen);
+            if (chosen) tl.fromTo(chosen.el, { attr: { r: 22 } }, { attr: { r: 12 }, duration: 0.45, ease: "power2.out" }, at + 0.4);
+            tl.fromTo("#running-rw" + i, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, at + 0.4);
+            const next = i + 1 < WALK.steps.length ? WALK.steps[i + 1].incumbent_cost : last;
+            if (chosen) tl.to(cost, { v: next, duration: 0.5, ease: "power2.out", onUpdate: () => { big.textContent = fmt(cost.v); } }, at + 0.4);
+            last = next;
+          });
+          // phase 2: hold-out confirmation on seeds the search never saw
+          const P2 = 8.3;
+          tl.to("#running-a", { opacity: 0.12, scale: 0.97, duration: 0.6, ease: "power2.inOut" }, P2);
+          tl.to(["#running-title", "#running-legend"], { opacity: 0, duration: 0.3 }, P2);
+          tl.fromTo("#running-hold", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.2);
+          const hn = document.getElementById("running-h-num");
+          const hv = { v: H.baseline_cost };
+          hn.textContent = fmt(H.baseline_cost);
+          tl.to(hv, { v: after, duration: 2.6, ease: "power2.inOut", onUpdate: () => { hn.textContent = fmt(hv.v); } }, P2 + 0.9);
+          tl.fromTo("#running-h-bar", { scaleX: 1 }, { scaleX: after / H.baseline_cost, duration: 2.6, ease: "power2.inOut" }, P2 + 0.9);
+          tl.fromTo("#running-h-badge", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, P2 + 3.5);
+          ["#running-c1", "#running-c2", "#running-c3"].forEach((c, i) =>
+            tl.fromTo(c, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, P2 + 3.9 + i * 0.25));
+          tl.to("#running-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["running"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

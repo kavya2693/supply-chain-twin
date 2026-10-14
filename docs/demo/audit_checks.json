@@ -1,0 +1,518 @@
+{
+ "generated": "2026-10-14 14:16",
+ "commit": "a4f50f5289cc8c298a8e842f8aadd139c609579c",
+ "checks": [
+  {
+   "id": "F-01",
+   "shown": "3 industry chips",
+   "type": "general-knowledge",
+   "status": "manual",
+   "computed": "-",
+   "reason": "Context statement, not a repo output."
+  },
+  {
+   "id": "F-02",
+   "shown": "4 problem cards",
+   "type": "general-knowledge",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-03",
+   "shown": "2 DCs",
+   "type": "direct",
+   "computed": "2",
+   "expect": "2",
+   "status": "pass"
+  },
+  {
+   "id": "F-04",
+   "shown": "36 stores",
+   "type": "direct",
+   "computed": "36",
+   "expect": "36",
+   "status": "pass"
+  },
+  {
+   "id": "F-05",
+   "shown": "26 trucks",
+   "type": "direct",
+   "computed": "26",
+   "expect": "26",
+   "status": "pass"
+  },
+  {
+   "id": "F-06",
+   "shown": "3.1M order lines",
+   "type": "derived",
+   "computed": "3.1M",
+   "expect": "3.1M",
+   "status": "pass"
+  },
+  {
+   "id": "F-07",
+   "shown": "2 years",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-08",
+   "shown": "120 SKUs in 8 categories",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-09",
+   "shown": "91-day quarter \u00d7 30 paired seeds",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-10",
+   "shown": "the twin itself is 3.3% low / \u22123.3% demand bias",
+   "type": "direct",
+   "computed": "-3.3%",
+   "expect": "-3.3%",
+   "status": "pass"
+  },
+  {
+   "id": "F-11",
+   "shown": "SOURCE DATA \u2192 DIGITAL TWIN \u2192 PROPOSE \u2192 SIMULATE \u2192 FAIR TEST \u2192 DECISION",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-12",
+   "shown": "\u2713 cheaper than today \u2713 re-tested on new days \u2713 weak spots shown",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-13",
+   "shown": "until nothing wins",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-14",
+   "shown": "Less stock cover (crosses 0) \u00b7 Promotion-aware ordering (below 0, above floor) \u00b7 Two fewer trucks (clears floor)",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-15",
+   "shown": "\u2717 could be noise \u00b7 \u2717 real, but inside twin error \u00b7 \u2713 clears the floor",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-16",
+   "shown": "Floor = 0.5% of quarterly cost / cost CI < \u22120.5% / floor \u22120.5%",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-17",
+   "shown": "twin.py \u00b7 TwinState \u00b7 fidelity.py \u00b7 sim.py \u00b7 simulate() \u00b7 harness.py \u00b7 llm.py \u00b7 agent.py \u00b7 cli.py \u00b7 load_sources()",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-18",
+   "shown": "28 trucks",
+   "type": "direct",
+   "computed": "28",
+   "expect": "28",
+   "status": "pass"
+  },
+  {
+   "id": "F-19",
+   "shown": "4,320 store-SKU rates",
+   "type": "derived",
+   "computed": "4,320",
+   "expect": "4,320",
+   "status": "pass"
+  },
+  {
+   "id": "F-20",
+   "shown": "Data quality \u00b7 data_quality.json",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-21",
+   "shown": "load_sources() \u00b7 4 CSV files",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-22",
+   "shown": "Backtest \u00b7 13 weeks",
+   "type": "derived",
+   "computed": "13",
+   "expect": "13",
+   "status": "pass"
+  },
+  {
+   "id": "F-23",
+   "shown": "WAPE 17.8% / 17.8%",
+   "type": "direct",
+   "computed": "17.8%",
+   "expect": "17.8%",
+   "status": "pass"
+  },
+  {
+   "id": "F-24",
+   "shown": "\u03c3 = 0.104 demand error",
+   "type": "direct",
+   "computed": "0.104",
+   "expect": "0.104",
+   "status": "pass"
+  },
+  {
+   "id": "F-25",
+   "shown": "bias \u22123.3%",
+   "type": "direct",
+   "computed": "-3.3%",
+   "expect": "-3.3%",
+   "status": "pass"
+  },
+  {
+   "id": "F-26",
+   "shown": "91 days \u00b7 sell 21:00 \u00b7 trucks 05\u201319 h",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-27",
+   "shown": "\u22480.1\u20130.2 s per simulated quarter",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-28",
+   "shown": "1,930 runs",
+   "type": "direct",
+   "computed": "1,930",
+   "expect": "1,930",
+   "status": "pass"
+  },
+  {
+   "id": "F-29",
+   "shown": "pool \u2264 4",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-30",
+   "shown": "180 s timeout",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-31",
+   "shown": "accept if cost CI < \u22120.5% and fill loss < 0.2 pts",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-32",
+   "shown": "30 hold-out seeds \u00d7 3 scenarios",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-33",
+   "shown": "round 8 \u00b7 71 tested (counts up through rounds 1-8)",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-34",
+   "shown": "make run \u2248 2.5 min / ~2.5 min",
+   "type": "derived",
+   "computed": "2.5 min",
+   "expect": "2.5 min",
+   "status": "pass"
+  },
+  {
+   "id": "F-35",
+   "shown": "3 scenarios \u00b7 base \u00b7 promo \u00b7 outage",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-36",
+   "shown": "71 candidates over 8 rounds; \u25b2 = 6 far costlier ones",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-37",
+   "shown": "1 review 2d \u2212143,755 \u00b7 2 trucks \u22122 \u221250,217 \u00b7 3 trucks \u22124 \u221256,085 \u00b7 4 trucks \u22126 \u221244,795 \u00b7 5 trucks \u22128 \u221246,004 \u00b7 6 promo-aware \u221220,339 \u00b7 7 z 0.84 \u221249,375 \u00b7 8 nothing passes",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-38",
+   "shown": "2,458,533 (start of the counter)",
+   "type": "direct",
+   "computed": "2,458,533",
+   "expect": "2,458,533",
+   "status": "pass"
+  },
+  {
+   "id": "F-39",
+   "shown": "2,047,964",
+   "type": "direct",
+   "computed": "2,047,964",
+   "expect": "2,047,964",
+   "status": "pass"
+  },
+  {
+   "id": "F-40",
+   "shown": "20 paired seeds per test",
+   "type": "direct",
+   "computed": "20",
+   "expect": "20",
+   "status": "pass"
+  },
+  {
+   "id": "F-41",
+   "shown": "2,458,347 \u2192 2,051,146",
+   "type": "derived",
+   "computed": "2,458,347 -> 2,051,146",
+   "expect": "2,458,347 -> 2,051,146",
+   "status": "pass"
+  },
+  {
+   "id": "F-42",
+   "shown": "\u221216.6%",
+   "type": "derived",
+   "computed": "-16.6%",
+   "expect": "-16.6%",
+   "status": "pass"
+  },
+  {
+   "id": "F-43",
+   "shown": "fill \u22120.13 pts",
+   "type": "direct",
+   "computed": "-0.13",
+   "expect": "-0.13",
+   "status": "pass"
+  },
+  {
+   "id": "F-44",
+   "shown": "truck use +12.9 pts",
+   "type": "direct",
+   "computed": "+12.9",
+   "expect": "+12.9",
+   "status": "pass"
+  },
+  {
+   "id": "F-45",
+   "shown": "searched plan: z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+   "type": "direct",
+   "computed": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+   "expect": "z=0.84 review=2d cover=1d trucks-8 promo_aware=yes",
+   "status": "pass"
+  },
+  {
+   "id": "F-46",
+   "shown": "Current policy 2,460,080 \u2026 High service 2,616,577 (+156,497 \u00b12,984)",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-47",
+   "shown": "3 of 6 changes clear the gate",
+   "type": "direct",
+   "computed": "3 of 6",
+   "expect": "3 of 6",
+   "status": "pass"
+  },
+  {
+   "id": "F-48",
+   "shown": "best: order every 2 days, \u2212142,008 a quarter",
+   "type": "direct",
+   "computed": "-142,008",
+   "expect": "-142,008",
+   "status": "pass"
+  },
+  {
+   "id": "F-49",
+   "shown": "65% \u2192 78%",
+   "type": "direct",
+   "computed": "65% -> 78%",
+   "expect": "65% -> 78%",
+   "status": "pass"
+  },
+  {
+   "id": "F-50",
+   "shown": "98.4% \u2192 96.8%",
+   "type": "direct",
+   "computed": "98.4% -> 96.8%",
+   "expect": "98.4% -> 96.8%",
+   "status": "pass"
+  },
+  {
+   "id": "F-51",
+   "shown": "PROMO QUARTER \u00b7 30 SEEDS / 30 seeds",
+   "type": "direct",
+   "computed": "30",
+   "expect": "30",
+   "status": "pass"
+  },
+  {
+   "id": "F-52",
+   "shown": "DCs \u2192 36 stores, deliveries on alternating days",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-53",
+   "shown": "\u22125.8%",
+   "type": "derived",
+   "computed": "-5.8%",
+   "expect": "-5.8%",
+   "status": "pass"
+  },
+  {
+   "id": "F-54",
+   "shown": "2,460,080 \u2192 2,318,072",
+   "type": "direct",
+   "computed": "2,460,080 -> 2,318,072",
+   "expect": "2,460,080 -> 2,318,072",
+   "status": "pass"
+  },
+  {
+   "id": "F-55",
+   "shown": "naive: 24.5% \u00b7 29.1%",
+   "type": "direct",
+   "computed": "24.5% / 29.1%",
+   "expect": "24.5% / 29.1%",
+   "status": "pass"
+  },
+  {
+   "id": "F-56",
+   "shown": "99.95% \u00b7 current policy 98.44%",
+   "type": "direct",
+   "computed": "99.95% / 98.44%",
+   "expect": "99.95% / 98.44%",
+   "status": "pass"
+  },
+  {
+   "id": "F-57",
+   "shown": "\u22120.13 \u00b7 \u2212407,200 cost \u00b7 holds",
+   "type": "direct",
+   "computed": "-0.13 -407,200 True",
+   "expect": "-0.13 -407,200 True",
+   "status": "pass"
+  },
+  {
+   "id": "F-58",
+   "shown": "\u22120.21 \u00b7 \u2212398,970 cost \u00b7 fails",
+   "type": "direct",
+   "computed": "-0.21 -398,970 False",
+   "expect": "-0.21 -398,970 False",
+   "status": "pass"
+  },
+  {
+   "id": "F-59",
+   "shown": "\u22121.88 \u00b7 +63,322 cost \u00b7 1,336 late loads \u00b7 fails",
+   "type": "direct",
+   "computed": "-1.88 +63,322 1,336 False",
+   "expect": "-1.88 +63,322 1,336 False",
+   "status": "pass"
+  },
+  {
+   "id": "F-60",
+   "shown": "0.2-pt limit",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-61",
+   "shown": "Ordering every 2 days alone is the robust win.",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-62",
+   "shown": "MIT",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-63",
+   "shown": "SimPy \u00b7 pandas \u00b7 SciPy \u00b7 Python",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-64",
+   "shown": "$ make run",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  }
+ ]
+}

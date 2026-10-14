@@ -1,0 +1,319 @@
+{
+ "scenario": "promo",
+ "n_seeds": 30,
+ "seeds": [
+  1000,
+  1029
+ ],
+ "rate_error_sigma": 0.1043130190101997,
+ "horizon_days": 91,
+ "rows": [
+  {
+   "strategy": "current policy",
+   "key": "z=1.28 review=1d cover=1d trucks+0 promo_aware=no",
+   "total_cost": 2460080.2381842416,
+   "cost_vs_current": 0.0,
+   "cost_vs_current_ci_half": 0.0,
+   "fill_rate": 0.9984809052811042,
+   "promo_fill_rate": 0.9843636104783265,
+   "truck_utilisation": 0.782329793100681,
+   "load_fill": 0.6460652400831932,
+   "beats_current": false
+  },
+  {
+   "strategy": "lean stock (z=0.84, cover 0d)",
+   "key": "z=0.84 review=1d cover=0d trucks+0 promo_aware=no",
+   "total_cost": 2588004.1203115894,
+   "cost_vs_current": 127923.88212734801,
+   "cost_vs_current_ci_half": 5004.150774747337,
+   "fill_rate": 0.9922152205964555,
+   "promo_fill_rate": 0.9372166479826824,
+   "truck_utilisation": 0.7841462263011797,
+   "load_fill": 0.6459702369616337,
+   "beats_current": false
+  },
+  {
+   "strategy": "high service (z=2.05, cover 2d)",
+   "key": "z=2.05 review=1d cover=2d trucks+0 promo_aware=no",
+   "total_cost": 2616577.409555622,
+   "cost_vs_current": 156497.17137138054,
+   "cost_vs_current_ci_half": 2983.8073279097152,
+   "fill_rate": 0.9995948497528406,
+   "promo_fill_rate": 0.9950512138806948,
+   "truck_utilisation": 0.7787020830817617,
+   "load_fill": 0.6416409717099689,
+   "beats_current": false
+  },
+  {
+   "strategy": "order every 2 days",
+   "key": "z=1.28 review=2d cover=1d trucks+0 promo_aware=no",
+   "total_cost": 2318072.0762298563,
+   "cost_vs_current": -142008.1619543849,
+   "cost_vs_current_ci_half": 3375.006918303261,
+   "fill_rate": 0.9976799840957973,
+   "promo_fill_rate": 0.9678617263349207,
+   "truck_utilisation": 0.6484212252948564,
+   "load_fill": 0.7759681532760018,
+   "beats_current": true
+  },
+  {
+   "strategy": "promo-aware ordering",
+   "key": "z=1.28 review=1d cover=1d trucks+0 promo_aware=yes",
+   "total_cost": 2440652.423378845,
+   "cost_vs_current": -19427.814805396443,
+   "cost_vs_current_ci_half": 2484.998439435898,
+   "fill_rate": 0.9992661345260665,
+   "promo_fill_rate": 0.9994881382034702,
+   "truck_utilisation": 0.7828455762186616,
+   "load_fill": 0.6458244900568485,
+   "beats_current": true
+  },
+  {
+   "strategy": "fleet -4 trucks",
+   "key": "z=1.28 review=1d cover=1d trucks-4 promo_aware=no",
+   "total_cost": 2382876.586380764,
+   "cost_vs_current": -77203.65180347726,
+   "cost_vs_current_ci_half": 3070.429307758721,
+   "fill_rate": 0.9975728905268993,
+   "promo_fill_rate": 0.9838544077939653,
+   "truck_utilisation": 0.9070938965796217,
+   "load_fill": 0.6386038544115243,
+   "beats_current": true
+  },
+  {
+   "strategy": "fleet +4 trucks",
+   "key": "z=1.28 review=1d cover=1d trucks+4 promo_aware=no",
+   "total_cost": 2547522.4662103252,
+   "cost_vs_current": 87442.2280260841,
+   "cost_vs_current_ci_half": 2690.8272048299405,
+   "fill_rate": 0.9986804372812748,
+   "promo_fill_rate": 0.9845218470976653,
+   "truck_utilisation": 0.6845966282923516,
+   "load_fill": 0.6531027655574333,
+   "beats_current": false
+  }
+ ],
+ "stores": [
+  {
+   "store": "S000",
+   "dc": "DC1",
+   "km": 114.1,
+   "index": 0
+  },
+  {
+   "store": "S001",
+   "dc": "DC1",
+   "km": 143.0,
+   "index": 1
+  },
+  {
+   "store": "S002",
+   "dc": "DC1",
+   "km": 35.7,
+   "index": 2
+  },
+  {
+   "store": "S003",
+   "dc": "DC1",
+   "km": 80.1,
+   "index": 3
+  },
+  {
+   "store": "S004",
+   "dc": "DC1",
+   "km": 105.3,
+   "index": 4
+  },
+  {
+   "store": "S005",
+   "dc": "DC1",
+   "km": 41.7,
+   "index": 5
+  },
+  {
+   "store": "S006",
+   "dc": "DC1",
+   "km": 161.3,
+   "index": 6
+  },
+  {
+   "store": "S007",
+   "dc": "DC1",
+   "km": 99.8,
+   "index": 7
+  },
+  {
+   "store": "S008",
+   "dc": "DC1",
+   "km": 185.8,
+   "index": 8
+  },
+  {
+   "store": "S009",
+   "dc": "DC1",
+   "km": 76.2,
+   "index": 9
+  },
+  {
+   "store": "S010",
+   "dc": "DC1",
+   "km": 59.2,
+   "index": 10
+  },
+  {
+   "store": "S011",
+   "dc": "DC1",
+   "km": 106.3,
+   "index": 11
+  },
+  {
+   "store": "S012",
+   "dc": "DC1",
+   "km": 142.0,
+   "index": 12
+  },
+  {
+   "store": "S013",
+   "dc": "DC1",
+   "km": 84.1,
+   "index": 13
+  },
+  {
+   "store": "S014",
+   "dc": "DC1",
+   "km": 116.7,
+   "index": 14
+  },
+  {
+   "store": "S015",
+   "dc": "DC1",
+   "km": 106.3,
+   "index": 15
+  },
+  {
+   "store": "S016",
+   "dc": "DC1",
+   "km": 104.5,
+   "index": 16
+  },
+  {
+   "store": "S017",
+   "dc": "DC1",
+   "km": 34.0,
+   "index": 17
+  },
+  {
+   "store": "S018",
+   "dc": "DC1",
+   "km": 84.2,
+   "index": 18
+  },
+  {
+   "store": "S019",
+   "dc": "DC1",
+   "km": 32.8,
+   "index": 19
+  },
+  {
+   "store": "S020",
+   "dc": "DC2",
+   "km": 62.5,
+   "index": 20
+  },
+  {
+   "store": "S021",
+   "dc": "DC2",
+   "km": 23.7,
+   "index": 21
+  },
+  {
+   "store": "S022",
+   "dc": "DC2",
+   "km": 135.7,
+   "index": 22
+  },
+  {
+   "store": "S023",
+   "dc": "DC2",
+   "km": 62.4,
+   "index": 23
+  },
+  {
+   "store": "S024",
+   "dc": "DC2",
+   "km": 126.9,
+   "index": 24
+  },
+  {
+   "store": "S025",
+   "dc": "DC2",
+   "km": 81.1,
+   "index": 25
+  },
+  {
+   "store": "S026",
+   "dc": "DC2",
+   "km": 122.4,
+   "index": 26
+  },
+  {
+   "store": "S027",
+   "dc": "DC2",
+   "km": 151.5,
+   "index": 27
+  },
+  {
+   "store": "S028",
+   "dc": "DC2",
+   "km": 101.3,
+   "index": 28
+  },
+  {
+   "store": "S029",
+   "dc": "DC2",
+   "km": 64.6,
+   "index": 29
+  },
+  {
+   "store": "S030",
+   "dc": "DC2",
+   "km": 136.2,
+   "index": 30
+  },
+  {
+   "store": "S031",
+   "dc": "DC2",
+   "km": 79.6,
+   "index": 31
+  },
+  {
+   "store": "S032",
+   "dc": "DC2",
+   "km": 96.1,
+   "index": 32
+  },
+  {
+   "store": "S033",
+   "dc": "DC2",
+   "km": 85.3,
+   "index": 33
+  },
+  {
+   "store": "S034",
+   "dc": "DC2",
+   "km": 50.6,
+   "index": 34
+  },
+  {
+   "store": "S035",
+   "dc": "DC2",
+   "km": 78.0,
+   "index": 35
+  }
+ ],
+ "trucks_per_dc": {
+  "DC1": 15,
+  "DC2": 11
+ },
+ "runtime_seconds": 12.3
+}
