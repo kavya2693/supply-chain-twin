@@ -8,6 +8,181 @@ Test replenishment, promotion and fleet-size changes on a digital twin of a reta
 before they reach a single store, and accept only the ones that beat the current policy by
 more than the twin's own error.
 
+[![90-second silent walkthrough: the retail problem, how the twin works, the architecture, the agent's search round by round, the planner's change scorecard, the results and what didn't win](docs/demo/demo.gif)](docs/demo/demo.mp4)
+
+*~90-second silent walkthrough. Click for the full video ([MP4, 6 MB](docs/demo/demo.mp4)).*
+
+📄 **Audit report:** every figure and assumption in the video, traced to its source — [PDF](docs/demo/AUDIT_REPORT.pdf) · [Word](docs/demo/AUDIT_REPORT.docx) · [Markdown](docs/demo/AUDIT_REPORT.md)
+
+## At a glance
+
+| | |
+|---|---|
+| **Problem** | A retail chain with 2 DCs, 36 stores and about 26 dispatchable trucks keeps being offered cheaper-looking changes: order every two days, stock up with the promotion calendar, hand back trucks. Trying one for real costs a quarter of empty shelves or overflowing backrooms, and the data to judge it is split across fleet, merchandise and order systems. |
+| **Approach** | Join the three sources (3.1M order lines, two years) into a twin, play out a 91-day quarter in SimPy, and compare every strategy with the current policy on the same 30 seeds. A change is accepted only if the whole 95% interval of its cost change is below -0.5% of baseline and fill rate drops by no more than 0.2 points. A neighbour search (or an optional local LLM) proposes; the harness decides. |
+| **Result** | Ordering every two days alone: **-142,008 ±3,375 per quarter** (about 6%), trucks leave 78% full instead of 65%. The searched plan: **-16.6% total cost** (-407,200) on 30 hold-out seeds of the quarter it was tuned on. Twin backtest: **17.8% weekly store x SKU WAPE** against 24.5% and 29.1% for two naive references. |
+| **What didn't win** | The searched plan fails off its tuning scenario: with 20% of the fleet out of service it costs **+63,322** and loses **1.88 points** of fill rate, and in a normal quarter it breaks the fill limit (-0.21 pts). The high-service policy has the best fill rate and loses 156,497. The language-model proposer has no live measurement; it timed out on this machine. |
+
+## Architecture
+
+![Architecture walkthrough: the three source systems, the twin and its backtest, the SimPy quarter, the proposer and the paired-seed harness that decides](docs/demo/architecture.gif)
+
+```mermaid
+flowchart LR
+    subgraph SRC["Sources"]
+        GEN["Seeded generator<br/>scripts/generate_data.py"]
+        FMS[("fms_fleet.csv<br/>28 trucks")]
+        ITM[("mms_items.csv<br/>120 SKUs")]
+        LOC[("mms_locations.csv<br/>36 stores, 2 DCs")]
+        OMS[("oms_order_lines.csv.gz<br/>3.1M lines")]
+    end
+
+    subgraph FEAT["Data and features"]
+        LOAD["Loader<br/>twin.load_sources"]
+        CAL["Holiday calendar<br/>calendar.py"]
+        JOIN["Join, repair, count defects<br/>twin.build_twin"]
+        DQ[("data_quality.json")]
+    end
+
+    subgraph MOD["Models"]
+        STATE["Twin state: base rates, weekday,<br/>month, holiday, promo multipliers,<br/>NB dispersion<br/>twin.TwinState"]
+        FID["13-week hold-out backtest<br/>fidelity.backtest"]
+        SIM["SimPy quarter: stores, DC dispatch,<br/>trucks in shift<br/>sim.simulate"]
+    end
+
+    subgraph DEC["Decision and optimiser"]
+        NB["Neighbour proposer<br/>agent.NeighbourProposer"]
+        LLM["Optional LLM proposer<br/>llm.LLMProposer"]
+        SNAP["Snap to parameter grid<br/>agent.snap"]
+        SEARCH["Search loop, Bonferroni per round<br/>agent.search"]
+    end
+
+    subgraph EVAL["Evaluation"]
+        HARN["Paired-seed runner + cache<br/>harness.Evaluator"]
+        RULE["Acceptance rule<br/>harness.Comparison"]
+        ROB["Hold-out seeds + every scenario<br/>cli.cmd_robustness"]
+        SCEN["Scenarios: base, promo, fleet_outage<br/>sim.SCENARIOS"]
+    end
+
+    subgraph OUT["Outputs"]
+        CLI["One-command run<br/>cli.main"]
+        RES[("outputs/<br/>strategy_table.csv<br/>search_*.csv, search_*.json<br/>fidelity.json")]
+    end
+
+    GEN --> FMS & ITM & LOC & OMS
+    FMS --> LOAD
+    ITM --> LOAD
+    LOC --> LOAD
+    OMS --> LOAD
+    LOAD -->|"4 DataFrames"| JOIN
+    CAL -->|"holiday and eve flags"| JOIN
+    JOIN -->|"repair counts"| DQ
+    JOIN -->|"rates, costs, distances, fleet"| STATE
+    LOAD -->|"history minus 91 days"| FID
+    FID -->|"error sigma 0.104"| SIM
+    STATE --> SIM
+    SCEN -->|"promo window, trucks down"| SIM
+    NB -->|"one grid step per lever"| SNAP
+    LLM -->|"JSON candidates"| SNAP
+    LLM -.->|"timeout or bad JSON: fall back"| NB
+    SNAP -->|"Strategy"| SEARCH
+    SEARCH -->|"candidate vs incumbent"| HARN
+    HARN -->|"strategy, scenario, seed"| SIM
+    SIM -->|"cost, fill, utilisation per run"| HARN
+    HARN -->|"paired differences, 95% CI"| RULE
+    RULE -.->|"accepted: new incumbent"| SEARCH
+    RULE -.->|"history of results"| LLM
+    SEARCH -->|"final plan"| ROB
+    ROB --> HARN
+    FID -->|"WAPE, bias"| CLI
+    RULE -->|"every comparison"| CLI
+    ROB -->|"verdict per scenario"| CLI
+    CLI -->|"writes"| RES
+
+    classDef data fill:#7fa8ff,stroke:#3d6fd9,color:#0b1020
+    classDef model fill:#b9a2ff,stroke:#7a5fd6,color:#0b1020
+    classDef decision fill:#3fd8a8,stroke:#1f9c76,color:#0b1020
+    classDef evaluation fill:#f2c46d,stroke:#b8902f,color:#0b1020
+    classDef risk fill:#ff8a73,stroke:#cc5640,color:#0b1020
+
+    class GEN,FMS,ITM,LOC,OMS,LOAD,CAL,JOIN,DQ,CLI,RES data
+    class STATE,FID,SIM model
+    class NB,SNAP,SEARCH decision
+    class HARN,RULE,ROB evaluation
+    class LLM,SCEN risk
+```
+
+Solid edges are the data flow of one run; dotted edges are the feedback and fallback paths.
+Red nodes are where risk enters: the untrusted language-model proposer, and the scenarios
+(the fleet outage above all) that the search is not tuned on.
+
+### Components
+
+| Component | Responsibility | File |
+|---|---|---|
+| Data generator | Two years of daily order lines with promotions, holidays, growth and planted defects; fleet, item and location masters | [`scripts/generate_data.py`](scripts/generate_data.py) |
+| Calendar | History window and public holidays, with the stock-up day before each | [`src/supply_twin/calendar.py`](src/supply_twin/calendar.py) |
+| Twin builder | Loads the four source files, repairs and counts defects, estimates rates, multipliers, promotion uplift and dispersion | [`src/supply_twin/twin.py`](src/supply_twin/twin.py) |
+| Fidelity backtest | Builds the twin 91 days early, scores it against unseen order lines and two naive references, measures the error spread fed to the simulator | [`src/supply_twin/fidelity.py`](src/supply_twin/fidelity.py) |
+| Simulator | SimPy quarter: evening sales, order-up-to review, shift-bound dispatch with trucks as tokens; strategies, scenarios, cost accounting | [`src/supply_twin/sim.py`](src/supply_twin/sim.py) |
+| Evaluation harness | Paired-seed comparisons, t-intervals, the acceptance rule, run cache, process pool | [`src/supply_twin/harness.py`](src/supply_twin/harness.py) |
+| Strategy agent | Parameter grid, neighbour proposer, search loop with Bonferroni, hold-out confirmation | [`src/supply_twin/agent.py`](src/supply_twin/agent.py) |
+| LLM proposer | Optional Ollama proposer: prompt from results so far, JSON parsing, grid snapping, fallback to neighbours | [`src/supply_twin/llm.py`](src/supply_twin/llm.py) |
+| Orchestrator | `supply-twin quality / fidelity / evaluate / search / all`, writes everything in `outputs/` | [`src/supply_twin/cli.py`](src/supply_twin/cli.py) |
+
+### Design decisions
+
+| Decision | Options considered | Chosen | Trade-off |
+|---|---|---|---|
+| Simulation engine | AnyLogic or another commercial twin tool; per-SKU agents; SimPy with each store's SKUs as one vector | SimPy, store-level processes, trucks as tokens in a per-DC store with a shift window ([ADR-0001](docs/adr/0001-paired-seeds-and-a-practical-floor-decide-strategies.md)) | A quarter runs in about 0.1-0.2 s, so many seeds per strategy are affordable; the price is no intra-day sales timing and no load building by SKU |
+| How strategies are compared | Independent seeds per strategy; common random numbers with paired differences | Paired: demand depends only on seed and scenario, never on the strategy | Run-to-run noise mostly cancels, but intervals then measure demand noise, not structural error in the twin |
+| What counts as a win | Statistical significance alone; significance plus a practical floor | Whole 95% cost interval below -0.5% of baseline, fill loss no more than 0.2 points | Tiny "significant" gains inside the twin's 3.3% bias are refused; the 0.5% itself is a judgement, recorded so it can be argued with |
+| Multiple testing in the search | No correction; Bonferroni per round | Bonferroni across the candidates of each round | Conservative, and in practice changed nothing because paired intervals are so tight; the floor does the real filtering |
+| Who picks the policy | Let a language model choose; model proposes, harness judges | Proposers (neighbour or LLM) only propose; values are snapped to a fixed grid; only the harness moves the incumbent | Reproducible and checkable, but the search can only reach plans on the grid |
+| Forecast error in simulated demand | A chosen spread; the spread measured in a backtest | Measured: sigma 0.104 from the 13-week hold-out | The twin is exactly as wrong in simulation as in history, but only as wrong as this history can show |
+| Joins | PySpark; pandas and numpy in memory | pandas and numpy | Three million lines fit comfortably and CI needs no JVM; a much larger extract would need the joins pushed into a warehouse |
+
+### Data contracts
+
+| Stage | Input | Output |
+|---|---|---|
+| Sources to loader | Four files in `data/` | `fms_fleet.csv`: `truck_id, home_dc, truck_type` (str), `capacity_cases` (float, nullable), `cost_per_km, daily_fixed_cost` (float), `status` (str); `mms_items.csv`: `sku_id, category` (str), `unit_cost` (float, nullable), `unit_price` (float), `case_pack` (int); `mms_locations.csv`: `store_id, dc_id, size_tier` (str), `distance_km, backroom_cases` (float); `oms_order_lines.csv.gz`: `order_date` (date), `store_id, sku_id` (str), `units` (int), `on_promo` (bool), non-zero lines only |
+| Twin builder | `Sources` (four DataFrames), `cutoff` date | `TwinState`: `base_rate` (store x SKU, units per day), `weekday_idx` (7) and `month_idx` (12) per category, `holiday_factor, eve_factor` (float), `promo_uplift` per category, `dispersion` (negative-binomial k), per-store `store_dc, distance_km, backroom_cases`, per-SKU `unit_cost, unit_price, case_pack`, dispatchable `fleet` frame; repair counts to `data_quality.json` |
+| Fidelity | `Sources`, 91-day hold-out | `Fidelity`: weekly WAPE at store x SKU and store x category and in promotion weeks, total bias, per reference (`twin, recent_8wk_mean, same_day_last_year`), `rate_error_sigma` (float); `fidelity.json` |
+| Simulator | `TwinState`, `Strategy` (`z` float, `review_days` int, `cover_days` float, `extra_trucks` int, `promo_aware` bool), `Scenario` (`horizon_days, promo_categories, promo_start_day, promo_days, trucks_down_share, rate_error_sigma`), `seed` | `RunResult.metrics()`: `fill_rate, promo_fill_rate, total_cost, operating_cost, holding_cost, overflow_cost, transport_cost, fleet_fixed_cost, lost_margin, truck_utilisation, load_fill, late_loads` (float) |
+| Harness | candidate and baseline `Strategy`, `Scenario`, seeds, alpha | `Comparison`: `cost_diff, fill_diff, util_diff` as (mean, low, high), `p_value, alpha, baseline_cost`, `accepted` (bool) |
+| Search and robustness | start `Strategy`, scenario, 20 search seeds, 30 hold-out seeds | `search_neighbour_promo.csv` (one row per candidate: `round, incumbent, candidate, cost_diff, cost_diff_low, cost_diff_high, fill_diff_pts, ..., accepted, chosen`), `search_neighbour_promo.json` (summary and hold-out), `search_neighbour_promo_robustness.csv` (one row per scenario with final fill, utilisation and late loads) |
+
+### Failure modes and fallbacks
+
+| Failure | What the code does |
+|---|---|
+| Order feed missing for a store-day (160 store-days here) | A store-day with no lines at all is read as an outage, not zero sales: it is marked unobserved and left out of every rate, multiplier and dispersion estimate, and the count goes to `data_quality.json`. |
+| Bad or incomplete master data | A missing landed cost is imputed from the category's median cost-to-price ratio; a missing truck capacity from the median of its truck type; trucks in maintenance or retired are dropped; order lines with an unknown store or SKU are dropped. Each repair is counted, never silent. |
+| Outlier orders | Bulk business buys above 1.5x the store-SKU 99.5th percentile (+5) are clipped, so one large order does not set a reorder point; 2,735 cells were clipped. |
+| Fleet short or broken down | A load waits for a free truck and no truck leaves outside the 05:00-19:00 shift, so a short fleet shows up as late loads and lost sales rather than an error. Fleet cuts and the outage scenario always leave at least one truck per DC. |
+| Twin degrades (demand drifts from history) | Partly handled: the backtest error spread is injected into simulated demand and the 0.5% floor absorbs the measured bias. Not monitored over time; the twin is re-estimated on every run with no drift check. |
+| LLM times out, server is down, or replies with garbage | Each call has a 180 s timeout; any exception or unparseable reply falls back to the neighbour proposer for that round and is counted; every proposed value is snapped to the grid; raw replies are written to `outputs/search_*_replies.json`. |
+| Search wanders on noise | Bonferroni per round plus the floor; the search stops when a round accepts nothing (or after 10 rounds), and the final plan is re-scored on seeds the search never saw. |
+| Source file late or absent | Not handled: a missing file stops the run with a read error, and there is no freshness check on the extract. |
+| Solver timeout | Not applicable: there is no optimisation solver; each simulation run is a bounded 91-day event loop. |
+
+### Path to production
+
+This is a mapping of each local piece to what would replace it in a deployed system, not a
+description of one that exists.
+
+| Here | Production equivalent |
+|---|---|
+| Seeded generator writing four CSVs to `data/` | Nightly extracts from the fleet, merchandise and order systems landed in a warehouse (BigQuery, Snowflake or Redshift), order lines partitioned by date |
+| pandas joins and repairs in `twin.py` | The same joins as SQL or dbt models in the warehouse, with each repair count turned into a data test that warns above a threshold |
+| `make run` on a laptop | A weekly scheduled job in Airflow or Step Functions that rebuilds the twin and reruns the backtest; searches and evaluations triggered on demand when a planner proposes a change |
+| `ProcessPoolExecutor` with 4 workers | Seeds fanned out as container jobs (Cloud Run Jobs, AWS Batch) or Ray tasks |
+| In-memory run cache | Results stored in object storage keyed by strategy, scenario, seed and twin version, so a repeat question costs nothing |
+| Local Ollama model | A managed model endpoint (Bedrock or Vertex AI) behind the same propose-only interface; the harness and the grid stay unchanged |
+| CSV and JSON in `outputs/` | A planner-facing change scorecard: cost interval, fill change, verdict per scenario, and a link to the run |
+| Monitoring and retraining (not built) | Weekly backtest WAPE and bias against both naive references, with an alert when total bias drifts past the 3.3% that justified the 0.5% floor; repair counts tracked per extract; after any rollout, actual cost and fill compared with the twin's interval for that change |
+
 ## The problem
 
 A regional retail chain runs two distribution centres, 36 stores and a fleet of about 26
